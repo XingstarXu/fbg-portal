@@ -71,6 +71,11 @@ export default {
                             sortable: true,
                         },
                         {
+                            label: "轉入倉庫(中)",
+                            key: "header.warehouse_desc2",
+                            sortable: true,
+                        },                        
+                        {
                             label:"日期",
                             key:"header.trans_date"
                         },

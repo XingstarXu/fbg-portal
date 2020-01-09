@@ -661,10 +661,6 @@ export default {
       isSelected(){
 
       },
-      pageChange(){
-          this.editIndex=-1;
-          this.$refs.child.$refs.selectTable.clearSelected()
-      },
       editRow(item){
        
           this.editItem.editIndex=item.data.index
@@ -759,7 +755,6 @@ export default {
   },
   mounted(){
     this.$refs.child.modal_titel="入倉管理"
-    this.$refs.child.serverModel=false;//分頁時不會在DB時獲取數據
     this.$refs.trItemDialog.setModalDialogName("TransItemDialog")
     this.$refs.child.selectMode="single"
     this.$refs.delItem.myName="ItemDele"//設置本對話框內的【Item刪除對話框】的名稱，以區分Trans_Delete的名稱

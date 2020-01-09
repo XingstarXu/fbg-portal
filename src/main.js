@@ -71,6 +71,12 @@ Vue.component("font-awesome-icon", FontAwesomeIcon)
 import VueCookies from "vue-cookies"
 Vue.use(VueCookies)
 
+// 引入伸缩效果组件
+import VueSidebarMenu from 'vue-sidebar-menu'
+import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
+
+Vue.use(VueSidebarMenu)
+
 new Vue({
     router,
     render: h => h(App),

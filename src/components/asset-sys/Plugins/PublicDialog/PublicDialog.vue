@@ -1,7 +1,7 @@
 <template>
 <div >
   
-  <b-modal id="ModalDialog" content-class="shadow" :title="modal_titel" @show="beforeOpen" @hide="cardCloseDo" 
+  <b-modal :id="myModalDialog" content-class="shadow" :title="modal_titel" @show="beforeOpen" @hide="cardCloseDo" 
                             @close="closeDialog" 
                             :cancel-disabled="cancelDisabled"
                             :cancel-title="cancelText"
@@ -57,7 +57,8 @@ export default {
       alert_variant:"",
       dismissSecs: 5,
       dismissCountDown: 0,
-      dialogSize:"md"
+      dialogSize:"md",
+      myModalDialog:"ModalDialog",
 
 
     }
@@ -86,7 +87,7 @@ export default {
     closeDialog(){
 
          this.isAoutoClose=true//標志為手動關閉。
-         this.$root.$emit('bv::hide::modal', 'ModalDialog')
+         this.$root.$emit('bv::hide::modal', this.myModalDialog)
      },
 
     openConterl(thisParent){
@@ -118,10 +119,16 @@ export default {
 
     saveData(controlDialog,saveLink,saveDate){
           let self=this;
-          this.closeControl(controlDialog);//調用公用窗體的confirmData方法，用禁用相關的按鈕。         
-          this.$http.post(saveLink,
-                          saveDate)
-                        .then(function(response){
+          this.closeControl(controlDialog);//調用公用窗體的confirmData方法，用禁用相關的按鈕。
+          console.log(saveLink);
+          self.axios(
+                {
+                    method: "POST",
+                    url: saveLink,
+                    data: saveDate,
+                }
+            )
+            .then(function(response){
                             if(response.data.code>0)
                             {
                               self.showAlert(response.data.msg,"success");
@@ -135,14 +142,40 @@ export default {
                             self.openConterl(controlDialog);//調用公用窗體的closeConfirm方法，用啟用相關的按鈕。
                             controlDialog.parentTable.textSearch();
 
-                        })
-                        .catch(function(error){
-                            //console.log(error);
+            })
+             .catch(function(error){
+                            console.log(error);
                             self.showAlert(error,"danger");
                             self.openConterl(controlDialog);//調用公用窗體的closeConfirm方法，用啟用相關的按鈕。
                             controlDialog.parentTable.textSearch();
-                        })
+             })
       },
+      // saveData(controlDialog,saveLink,saveDate){         
+      //     this.$http.post(saveLink,
+      //                     saveDate)
+      //                   .then(function(response){
+      //                       if(response.data.code>0)
+      //                       {
+      //                         self.showAlert(response.data.msg,"success");
+
+      //                       }
+      //                       else{
+      //                         self.showAlert(response.data.msg,"danger");
+
+      //                       }
+
+      //                       self.openConterl(controlDialog);//調用公用窗體的closeConfirm方法，用啟用相關的按鈕。
+      //                       controlDialog.parentTable.textSearch();
+
+      //                   })
+      //                   .catch(function(error){
+      //                       console.log(error);
+      //                       self.showAlert(error,"danger");
+      //                       self.openConterl(controlDialog);//調用公用窗體的closeConfirm方法，用啟用相關的按鈕。
+      //                       controlDialog.parentTable.textSearch();
+      //                   })
+      // },
+
   }
   
 }

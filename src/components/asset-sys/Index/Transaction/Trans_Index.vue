@@ -21,6 +21,7 @@ import TransTable from "../../components/Transaction/Trans_Table";
 import TransDialog from "../../components/Transaction/Trans_Dialog";
 import TransDelete from "../../components/Transaction/Trans_Delete";
 
+
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
 
@@ -37,7 +38,7 @@ export default {
             searchLink:"http://192.168.12.26:9090/asset-sys/sel-trans-for-table/",
             getWareHouseLink:"http://192.168.12.26:9090/asset-sys/sel-wh/",
             getVendorLink:"http://192.168.12.26:9090/asset-sys/sel-vdr/",
-            getItemLink:"http://192.168.12.26:9090/asset-sys/sel-item/"
+            getItemLink:"http://192.168.12.26:9090/asset-sys/sel-item-for-table/"
 
 
         }

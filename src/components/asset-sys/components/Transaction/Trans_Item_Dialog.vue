@@ -1,5 +1,6 @@
 <template>
 <div>
+   <ItemDialog ref="itDialog"/>
    <publicDialogTable ref="child" >    
           <template v-slot:body>
              <div>
@@ -12,6 +13,11 @@
                               <b-button variant="outline-success" @click="textSearch" >Search</b-button>
                               </b-input-group-append>
                         </b-input-group>
+                    </b-col>
+                  </b-row>
+                  <b-row>
+                    <b-col>
+                      <b-button @click="showItemNewDialog" variant="info"> 添加新資產 </b-button>
                     </b-col>
                   </b-row>
                 </b-container>               
@@ -45,6 +51,7 @@
 </template>
 <script>
 //import { required, minLength, helpers } from 'vuelidate/lib/validators'
+import ItemDialog from "../Item/Item_Dialog"
 export default {
   name:"trDialog",
   data(){
@@ -87,7 +94,12 @@ export default {
         selected:[],
         sysSelecteds:[],
         importCount:0,
-        parentTable:null
+        parentTable:null,
+        searchData:{},
+        addLink:"http://192.168.12.26:9090/asset-sys/cre-item/",
+        getTypeLink:"http://192.168.12.26:9090/asset-sys/sel-item-type/",
+        getUnitLink:"http://192.168.12.26:9090/asset-sys/sel-item-unit/",
+        getVendonLink:"http://192.168.12.26:9090/asset-sys/sel-vdr/"
 
     }
   },
@@ -146,7 +158,15 @@ export default {
 
     badingData(){
             let self=this
-            this.$http.post(this.$parent.$parent.getItemLink,{"search":self.search,"disable":0})
+            this.searchData={
+                            "page":this.$refs.child.tableConfig.currentPage,
+                            "num_of_page":this.$refs.child.tableConfig.perPage,
+                            "search":this.search,
+                            "iso":-1,
+                            "order_by":"",
+                            "order_desc":false
+            }
+            this.$http.post(this.$parent.$parent.getItemLink,this.searchData)
                         .then(function(response){
                             let res=response.data
                             self.$refs.child.tableRows = res.data
@@ -154,6 +174,7 @@ export default {
                             self.isLoading=false
                             self.$refs.child.tableConfig.totalRows=res.records
                             self.$refs.child.tableConfig.totalPage=Math.ceil(res.records / self.$refs.child.tableConfig.perPage)
+                            self.showSelectRow()//顯示被選中的行樣式
 
                         })
                         .catch(function(){
@@ -227,16 +248,34 @@ export default {
 
       },
     rowClass(){
+      },
+    
+    showItemNewDialog(){
+        this.$refs.itDialog.operation="add"
+        this.$refs.itDialog.parentTable=this
+        this.$bvModal.show('ItemDialog')
+    },
+
+    showSelectRow(){
+      for (let index = 0; index < this.$refs.child.tableRows.length; index++) {
+         this.selected.forEach(selectItme=>{
+           if(selectItme.item_id==this.$refs.child.tableRows[index].item_id){
+             this.$refs.child.selectTable.selectRow(index)
+           }
+         })      
       }
+    }
            
 
   },
   components:{
+    ItemDialog
 
   },
   mounted(){
     this.$refs.child.modal_titel="入倉資產選擇"
     this.$refs.child.tableColumns=this.columns
+    this.$refs.itDialog.setModalDialogName("ItemDialog")
   },
   // validations: {
   //   editData: {

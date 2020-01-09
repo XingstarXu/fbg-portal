@@ -47,8 +47,7 @@
               :select-mode="selectMode"
               @row-clicked="onRowClicked"
               @row-selected="onRowSelected"
-              :per-page="tableConfig.perPage"
-              :current-page="tableConfig.currentPage"  
+
               @change="pageChange"            
               ref="selectTable"
              
@@ -58,7 +57,7 @@
                       v-model="tableConfig.currentPage"
                       :total-rows="tableConfig.totalRows"
                       :per-page="tableConfig.perPage"
-                     
+                      @change="pageChange"
                       align="right"
                       size="sm"
                       class="my-0"
@@ -301,7 +300,8 @@ export default {
        },
 
     pageChange (page) {
-        this.$parent.pageChange(page)
+        this.tableConfig.currentPage = page;
+        this.$parent.textSearch(); //調用父級的查詢方法，以應用不同的處理。
       },       
 // 處理已選擇行的記錄。刪除已選擇行的記錄
     onRowClicked(item){

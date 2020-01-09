@@ -196,7 +196,7 @@ export default {
       continueSaver:false, //是否繼續保存標示
       addData:{},
       updateData:{},
-      parentTable: null
+      parentTable: this.$parent.$refs.itTable
 
     }
   },
@@ -277,7 +277,7 @@ export default {
       this.isDisabled=true
       this.$parent.isLoading=false
       this.editDisable_Disabled=false
-      this.parentTable=this.$parent.$refs.itTable 
+      //this.parentTable=this.$parent.$refs.itTable 
       if(this.operation=="add")
       {
           this.editData={
@@ -404,7 +404,10 @@ export default {
       }).catch(function(error){
           self.$refs.child.showAlert(error,"danger")        
       })
-    }
+    },
+    setModalDialogName(strName){
+       this.$refs.child.myModalDialog=strName
+     },
  
   },
   components:{

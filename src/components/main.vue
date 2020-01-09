@@ -27,6 +27,30 @@
                                 :to="item.url"> {{ item.tabName }}
                             </b-nav-item>
                         </b-nav>
+
+                   <!--<<<<<<<<<<菜單測試>>>>>>>>>>>>>>-->
+                        <!-- 一级菜单 开始 -->
+                        <!-- <div id="navigation" class="flex flex-direction-column">
+                            <li v-for="firstLevel in menus" :key="firstLevel.index">
+                                <div  class="menu-item first-level" @click='changeExpand(firstLevel)'>
+                                    <img :src="firstLevel.icon" alt=""> 
+                                    <span>{{ firstLevel.title }}</span>
+                                </div> -->
+                                <!-- 二级菜单 开始 -->
+                                <!-- <collapse-transition>
+                                    <div class="second-level-container" v-show="firstLevel.isExpand">
+                                    <div class="menu-item second-level" v-for="secondLevel in firstLevel.children" :key="secondLevel">
+                                         <img src="../assets/images/dot_unselected.png" alt=""> 
+                                        {{ secondLevel.title }}
+                                    </div>
+                                    </div>
+                                </collapse-transition> -->
+                                <!-- 二级菜单 结束 -->
+                            <!-- </li> -->
+                            <!-- 一级菜单 结束 -->
+                        <!-- </div> -->
+                    <!--<<<<<<<<<<菜單測試>>>>>>>>>>>>>>-->
+
                     </div>
                 </b-col>
 
@@ -109,7 +133,83 @@
                 },
                 component: {
                     login: "/login"
-                }
+                },
+
+            //     menus:[
+            //     {
+            //         "title": "主頁面",
+            //         "icon": "",
+            //         "url":"/profile",
+            //         "isExpand": false,
+            //         "children": []
+            //     },
+            //     {
+            //         "title": "部門",
+            //         "icon": "",
+            //         "url":"/act-sys/dept",
+            //         "isExpand": false,
+            //         "children": []
+            //     },
+            //     {
+            //         "title": "角色",
+            //         "icon": "",
+            //         "url":"/act-sys/role",
+            //         "isExpand": false,
+            //         "children": []
+            //     }, 
+            //     {
+            //         "title": "廳團對數",
+            //         "icon": "",
+            //         "url":"/fbrel",
+            //         "isExpand": false,
+            //         "children": []
+            //     },                                                                
+            //     {
+            //         "title": "資產系統",
+            //         "icon": "",
+            //         "url":"",
+            //         "isExpand": true,
+            //         "children": [{
+            //             "title": "資產管理",
+            //             "icon": "",
+            //             "url":"/asset-sys/item",
+            //             "isExpand": false,
+            //         }, {
+            //             "title": "資產類型",
+            //             "icon": "",
+            //             "url":"/asset-sys/itemType",
+            //             "isExpand": false,
+            //         }, {
+            //             "title": "資產單位",
+            //             "icon": "",
+            //             "url":"/asset-sys/itemUnit",
+            //             "isExpand": false,
+            //         }, {
+            //             "title": "倉庫管理",
+            //             "icon": "",
+            //             "url":"/asset-sys/StoreHouse",
+            //             "isExpand": false,
+            //         }, {
+            //             "title": "入倉管理",
+            //             "icon": "",
+            //             "url":"/asset-sys/Transaction",
+            //             "isExpand": false,
+            //         }, {
+            //             "title": "轉倉管理",
+            //             "icon": "",
+            //             "url":"/asset-sys/Transfer",
+            //             "isExpand": false,
+            //         }, {
+            //             "title": "供應商管理",
+            //             "icon": "",
+            //             "url":"/asset-sys/Vendor",
+            //             "isExpand": false,
+            //         }
+                    
+                    
+            //         ]
+            //     }
+            // ]  
             }
         },
         methods: {
@@ -153,6 +253,12 @@
                     return
                 }
             },
+
+            //展开收起按钮点击 By Xing
+            changeExpand(menu) {
+                menu.isExpand = !menu.isExpand
+                //console.log(menu.isExpand)
+            }
         },
         mounted: function() {
             let self = this
@@ -178,7 +284,8 @@
                 "倉庫管理",
                 "入倉管理",
                 "轉倉管理",
-                "供應商管理"
+                "供應商管理" ,
+                "測試"
 
             ]
             var tabUrls = [
@@ -193,19 +300,25 @@
                 "/asset-sys/StoreHouse",
                 "/asset-sys/Transaction",
                 "/asset-sys/Transfer",
-                "/asset-sys/Vendor"
+                "/asset-sys/Vendor",
+                "/test" 
 
             ]
 
-            for(let i = 1; i <= tabNameList.length; i++) {
+             for(let i = 1; i <= tabNameList.length; i++) {
                 let item = {
                     "tabID": "nav-item" + i,
                     "tabName": tabNameList[i-1],
                     "classValue": self.navItemClass.notSel,
                     "url": tabUrls[i-1]
+
                 }
                 self.navItemList.push(item)
-            }
+            } 
+            
+          
+
+
             // 指向「主面頁」
             self.navItemList[0].classValue = self.navItemClass.sel
         },

@@ -36,7 +36,7 @@ export default {
             voidLink:"http://192.168.12.26:9090/asset-sys/void-trans/",
             searchLink:"http://192.168.12.26:9090/asset-sys/sel-trans-for-table/",
             getWareHouseLink:"http://192.168.12.26:9090/asset-sys/sel-wh/",          
-            getItemLink:"http://192.168.12.26:9090/asset-sys/sel-item/"
+            getItemLink:"http://192.168.12.26:9090/asset-sys/sel-item-for-table/"
 
 
         }

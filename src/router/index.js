@@ -22,6 +22,7 @@ import AssetSysStoreHouse from "@/components/asset-sys/Index/StoreHouse/StoreHou
 import AssetSysTransaction from "@/components/asset-sys/Index/Transaction/Trans_Index"
 import AssetSysTransferTransaction from "@/components/asset-sys/Index/TransferTransaction/Transfer_Index"
 import AssetSysVendor from "@/components/asset-sys/Index/Vendor/Vendor_Index"
+import TST from "@/test/Layout.vue"
 
 
 
@@ -131,6 +132,12 @@ export default new VueRouter({
                     path:"/asset-sys/Vendor",
                     name:"AssetSysVendor",
                     component:AssetSysVendor
+
+                },
+                {// test
+                    path:"/test",
+                    name:"test",
+                    component:TST
 
                 },
 

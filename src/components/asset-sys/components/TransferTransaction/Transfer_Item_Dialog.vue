@@ -84,7 +84,8 @@ export default {
         selected:[],
         sysSelecteds:[],
         importCount:0,
-        parentTable:null
+        parentTable:null,
+        searchData:{}
 
     }
   },
@@ -148,14 +149,23 @@ export default {
 
     badingData(){
             let self=this
-            this.$http.post(this.$parent.$parent.getItemLink,{"search":self.search,"disable":0})
+            self.searchData={
+                            "page":this.$refs.child.tableConfig.currentPage,
+                            "num_of_page":this.$refs.child.tableConfig.perPage,
+                            "search":this.search,
+                            "iso":-1,
+                            "order_by":"",
+                            "order_desc":false
+            }
+            this.$http.post(this.$parent.$parent.getItemLink,self.searchData)
                         .then(function(response){
                             let res=response.data
                             self.$refs.child.tableRows = res.data
                             self.$refs.child.tableColumns=self.columns
                             self.isLoading=false
-                            self.$refs.child.tableConfig.totalRows=res.records;
+                            self.$refs.child.tableConfig.totalRows=res.records
                             self.$refs.child.tableConfig.totalPage=Math.ceil(res.records / self.$refs.child.tableConfig.perPage)
+                            this.showSelectRow()
 
                         })
                         .catch(function(){
@@ -232,7 +242,16 @@ export default {
 
       },
       rowClass(){
+      },
+      showSelectRow(){
+      for (let index = 0; index < this.$refs.child.tableRows.length; index++) {
+         this.selected.forEach(selectItme=>{
+           if(selectItme.item_id==this.$refs.child.tableRows[index].item_id){
+             this.$refs.child.selectTable.selectRow(index)
+           }
+         })      
       }
+    }
            
 
   },
