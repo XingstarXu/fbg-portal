@@ -71,6 +71,12 @@
                         </slot>
                         
                 </template>
+                <template v-slot:cell(opColumn2)="data" >
+                        <slot name="diyColumn2" v-bind="{data}">
+
+                        </slot>
+                        
+                </template>
 
 
                 <template v-slot:cell(photoColumn)="data">
@@ -106,38 +112,46 @@ export default {
                 isDisable:0,
                 totalPage:0
             },
+            isPageChange:false
         }
     },
     methods:{
             rowClass(item) {
-                return this.$parent.rowClass(item);//調用父級的綁定數據方法，以應用不同的處理。
+                return this.$parent.rowClass(item)//調用父級的綁定數據方法，以應用不同的處理。
             },
 
             pageChange (page) {
-                this.config.currentPage = page;
+                this.config.currentPage = page
+                this.isPageChange=true
                 this.$parent.textSearch(); //調用父級的查詢方法，以應用不同的處理。
             },
 
             selectRow(index){
-                this.$refs.publicTable.selectRow(index);
+                this.$refs.publicTable.selectRow(index)
             },
             badingData(publicTable){
-                    let self=this; 
+                    let self=this
                     let searchLink=publicTable.searchLink
                     let searchData=publicTable.searchData
-                    publicTable.$parent.isLoading=true;  
+                    publicTable.$parent.isLoading=true
+                    //當加載數據時，如果不是改變當前頁時的即將當前頁還原為第一頁。解決查詢數據時當前頁沒有改變的問題。
+                    if(!this.isPageChange){
+                        self.config.currentPage=1
+                        searchData.page=self.config.currentPage
+                    }
+                    this.isPageChange=false
                     this.$http.post(searchLink,searchData)
                                 .then(function(response){
-                                    let res=response.data;
+                                    let res=response.data
                                     self.rows = res.data
-                                    publicTable.$parent.isLoading=false; 
-                                    self.config.totalPage=res.total_page;  
-                                    self.config.totalRows=res.records;
+                                    publicTable.$parent.isLoading=false
+                                    self.config.totalPage=res.total_page
+                                    self.config.totalRows=res.records
 
                                 })
                                 .catch(function(){
                                     //console.log(error);
-                                    publicTable.$parent.isLoading=false; 
+                                    publicTable.$parent.isLoading=false
                                 })
 
 

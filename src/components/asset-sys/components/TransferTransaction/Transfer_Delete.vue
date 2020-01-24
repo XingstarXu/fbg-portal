@@ -51,26 +51,45 @@ export default {
       saveText:"確認",//保存制名稱
       isSaveDisabled:false,//保存制禁用標識
       isDisabled:false,
-      deleteData:{_id:"", code:""}
+      deleteData:{_id:"", code:"",void_reason:""}
 
 
     }
   },
   methods:{
     saveData(){
-            this.$v.$touch();
+            this.$v.$touch()
             if(this.$v.$invalid){
-               return;
+               return
             }
-            this.parentTable=this.$parent.$refs.tfTable
-            this.$refs.child.updateData(this,this.$parent.voidLink,this.saveData)
+            //獲取安全Cookies
+            let securityID=""
+            if(this.$cookies.isKey("security_id")) {
+                securityID = this.$cookies.get("security_id")
+            }
+            else {
+                // 轉至「登入」頁面
+                self.$router.replace("/login")
+                return
+            }  
+                      
+            this.parentTable=this.$parent.$refs.ttTable
+            this.saveData={
+                          website_code: "WEB01",
+                          security_id: securityID,             
+                          transfer_header_id :this.deleteData._id,
+                          void_reason: this.deleteData.void_reason
+                          }            
+            this.$refs.child.saveData(this,this.$parent.voidLink,this.saveData)
+
 
     },
       setData(deleteRow){
             //editRow.vendor_id.replace(/-/g,''),
                 this.deleteData={
-                                tranfer_id: deleteRow.item.header._id,
-                                tranfer_code: deleteRow.item.header.code,
+                                _id: deleteRow.item.header.transfer_header_id,
+                                code: deleteRow.item.header.transfer_header_code,
+                                void_reason:""
                               };
           }      
  

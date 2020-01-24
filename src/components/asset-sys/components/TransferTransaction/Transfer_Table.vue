@@ -55,17 +55,17 @@ export default {
 
                         {
                             label: "轉倉單號",
-                            key: "header.code",
+                            key: "header.transfer_code",
                             sortable: true,
                         },                     
                         {
                             label: "原倉庫",
-                            key: "header.from_wh_desc2",
+                            key: "header.from_warehouse_desc2",
                             sortable: true,
                         },
                         {
                             label: "轉至倉庫",
-                            key: "header.to_wh_desc2",
+                            key: "header.to_warehouse_desc2",
                             sortable: true,
                         },                       
                         {
@@ -122,17 +122,33 @@ export default {
            this.$bvModal.show('ModalDialog');
        },
       textSearch(){
-            // this.searchLink=this.$parent.searchLink
-            // this.searchData={
-            //         "page":this.$refs.child.config.currentPage,
-            //         "num_of_page":this.$refs.child.config.perPage,
-            //         "search":this.searchText,
-            //         "order_by":"",
-            //         "order_desc":false,
-            //         "trans_date":this.searchDate,
-            //         "void":this.isVoid
-            // }
-            // this.$refs.child.badingData(this);//調用公用表的綁定方法
+            //獲取安全Cookies
+            let self=this
+            let securityID=""
+            if(self.$cookies.isKey("security_id")) {
+                securityID = self.$cookies.get("security_id")
+            }
+            else {
+                // 轉至「登入」頁面
+                self.$router.replace("/login")
+                return
+            }
+
+            this.searchLink=this.$parent.searchLink
+            this.searchData={
+                    "website_code": "WEB01",
+                    "security_id" : securityID,                
+                    "page":this.$refs.child.config.currentPage,
+                    "num_of_page":this.$refs.child.config.perPage,
+                    "search":this.searchText,
+                    "order_by":"",
+                    "order_desc":false,
+                    "transfer_date":this.searchDate,
+                    "void":this.isVoid
+            }
+            this.$refs.child.badingData(this);//調用公用表的綁定方法
+            
+            
       },
       //停用或取消記錄時的行樣式
       rowClass(item) {
@@ -170,9 +186,4 @@ export default {
     
 }
 </script>
-<style lang="scss">
-#columnDispay{
-  display: none
-}
 
-</style>

@@ -1,8 +1,6 @@
 <template>
    <div>
-
-
-
+        <ItemViewDialog ref="itDialog"/>
         <publicTable ref="child" >
             <template v-slot:searchAdd>
                  <b-container fluid >
@@ -34,7 +32,8 @@
             </template>
 
             <template v-slot:diyColumn="myItem">
-                  <b-button @click="showEditDialog(myItem.data.item,myItem.data.index)" variant="info"><font-awesome-icon  icon="edit" /></b-button>
+                  <b-button @click="showEditDialog(myItem.data.item,myItem.data.index)" variant="primary"><font-awesome-icon  icon="edit" /></b-button> | 
+                  <b-button @click="showAssetDialog(myItem.data.item)" variant="info">項目明細</b-button>
             </template>
 
             
@@ -48,6 +47,7 @@
    </div>
 </template>
 <script>
+ import ItemViewDialog from "../Item/Item_View"
 export default {
     name:'Vendor',
     data(){
@@ -118,6 +118,7 @@ export default {
         }, 
 
         textSearch(){
+
             this.searchLink=this.$parent.searchLink
             this.searchData={
                         "page":this.$refs.child.config.currentPage,
@@ -137,24 +138,25 @@ export default {
                 return 'table-danger'
             } 
         },
+        showAssetDialog(item){
+            this.$refs.itDialog.search.vendorId=item.vendor_id
+            this.$refs.itDialog.modalTitel=item.vendor_desc2+" 供應商資產明細"
+            this.$bvModal.show('ItemViewDialog')
+            this.$refs.itDialog.badingData()
+        },
+
      
     },
     components:{
-
+        ItemViewDialog
     },
     mounted:function(){
         this.$refs.child.columns=this.columns;
         this.$refs.child.config.title="供應商管理"
-        this.textSearch();
-
-        
-    },
+        this.$refs.itDialog.setModalDialogName("ItemViewDialog")
+        this.textSearch()
+ 
+    }
     
 }
 </script>
-<style lang="scss">
-
-#columnDispay{
-  display: none
-}
-</style>

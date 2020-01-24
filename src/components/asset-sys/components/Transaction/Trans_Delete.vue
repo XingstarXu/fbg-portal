@@ -69,17 +69,31 @@ export default {
             if(this.$v.$invalid){
                return;
             }
+            //獲取安全Cookies
+            let securityID=""
+            if(this.$cookies.isKey("security_id")) {
+                securityID = this.$cookies.get("security_id")
+            }
+            else {
+                // 轉至「登入」頁面
+                self.$router.replace("/login")
+                return
+            }  
+                      
             this.parentTable=this.$parent.$refs.trTable
-            this.saveData={_id:this.deleteData._id,
-                          void_by:"jx.xu", 
+            this.saveData={
+                          website_code: "WEB01",
+                          security_id: securityID,             
+                          trans_header_id:this.deleteData._id,
                           void_reason: this.deleteData.void_reason
                           }            
             this.$refs.child.saveData(this,this.$parent.voidLink,this.saveData)
     },
     setData(deleteRow){
+      console.log(deleteRow)
                 this.deleteData={
-                                _id: deleteRow.item.header._id,
-                                code: deleteRow.item.header.code,
+                                _id: deleteRow.item.header.trans_header_id,
+                                code: deleteRow.item.header.trans_code,
                                 void_reason: deleteRow.item.header.void_reason
                               };
     },

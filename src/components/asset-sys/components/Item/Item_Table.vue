@@ -37,8 +37,18 @@
                   <b-button @click="showEditDialog(myItem.data.item,myItem.data.index)" variant="info"><font-awesome-icon  icon="edit" /></b-button>
             </template>
 
-            <template v-slot:photoColumn="myphoto">
-                  <img src="../../../../assets/assetsPhoto/1000006.jpg">
+             <template v-slot:diyColumn2="myItem2">
+                  <div v-if="myItem2.data.item.iso==1">
+                     <font-awesome-icon icon="check" style="color:#00EB00"/>
+                  </div>
+                  <div v-else>
+                     <font-awesome-icon icon="times" style="color:#E60000"/>
+                  </div>
+                  
+            </template>           
+
+            <template v-slot:photoColumn="myphoto" class="photoImg">
+                  <b-img :src="getImage(myphoto.data.item)" width="80" height="80"/>
             </template>
            
         </publicTable>
@@ -51,17 +61,17 @@ export default {
         return{
             rows:[],
             columns: [{
-                            label: "資產編號",
+                            label: "項目編號",
                             key: "item_code",
                             sortable: true,
                         },
                         {
-                            label: "資產名稱(英)",
+                            label: "項目名稱(英)",
                             key: "item_desc1",
                             sortable: true,
                         },
                         {
-                            label: "資產名稱(中)",
+                            label: "項目名稱(中)",
                             key: "item_desc2",
                             sortable: true,
                         },
@@ -73,7 +83,11 @@ export default {
                         {
                             label:"總額",
                             key:"amt"
-                        },                                             
+                        }, 
+                        {
+                            label:"ISO",
+                            key:"opColumn2"
+                        },                                            
                         {
                             label:"操作",
                             key:"opColumn"
@@ -90,7 +104,7 @@ export default {
             disableOptions:[{value:0,text:"使用"},{value:1,text:"停用"},{value:-1,text:"全部"}],
             searchText:"",
             searchLink:"",
-            searchData:{},            
+            searchData:{}
 
         }
     },
@@ -115,8 +129,22 @@ export default {
 
         },      
         textSearch(){
+                //獲取安全Cookies
+                let self=this
+                let securityID=""
+                if(self.$cookies.isKey("security_id")) {
+                    securityID = self.$cookies.get("security_id")
+                }
+                else {
+                    // 轉至「登入」頁面
+                    self.$router.replace("/login")
+                    return
+                }
+
                 this.searchLink=this.$parent.searchLink
                 this.searchData={
+                            "website_code":"WEB01",
+                            "security_id":securityID,                    
                             "page":this.$refs.child.config.currentPage,
                             "num_of_page":this.$refs.child.config.perPage,
                             "search":this.searchText,
@@ -134,6 +162,9 @@ export default {
                 return 'table-danger'
             } 
         },
+        getImage(item){
+              return "data:image/jpeg;base64," + item.img
+        }
     },
     components:{
     },
@@ -147,6 +178,4 @@ export default {
 
 }
 </script>
-<style  lang="scss">
 
-</style>

@@ -47,7 +47,8 @@ import {
     faBug,
     faCaretSquareRight,
     faCaretSquareLeft,
-    faEdit
+    faEdit,
+    faCheck
 } from "@fortawesome/free-solid-svg-icons"
 library.add(
     faUserCircle,
@@ -63,7 +64,8 @@ library.add(
     faBug,
     faCaretSquareRight,
     faCaretSquareLeft,
-    faEdit
+    faEdit,
+    faCheck
 );
 Vue.component("font-awesome-icon", FontAwesomeIcon)
 

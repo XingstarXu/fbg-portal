@@ -52,38 +52,38 @@ export default {
     },
     mounted: function() {
         let self = this
+        self.$router.replace({ name: "Main" })
+        // self.axios(
+        //     {
+        //         method: "POST",
+        //         url: self.api.checkWebsiteStatus,
+        //         data: {
+        //             website_code: self.websiteCode
+        //         }
+        //     }
+        // ).then(function(response) {
+        //     var code = response.data.code
+        //     // var msg = response.data.msg
 
-        self.axios(
-            {
-                method: "POST",
-                url: self.api.checkWebsiteStatus,
-                data: {
-                    website_code: self.websiteCode
-                }
-            }
-        ).then(function(response) {
-            var code = response.data.code
-            // var msg = response.data.msg
-
-            if(code > 0) {
-                // 網站維護中
-                if(code == 1311003) {
-                    self.webStatus = 2
-                } else {
-                    // 轉至登入介面
-                    self.$router.replace({ name: "UserAuth" })
-                }
-            }
-            else {
-                // 網站錯誤
-                self.webStatus = -1
-            }
-        }).catch(function() {
-            // TOMMY
-            // console.log(error)
-            // 網站錯誤
-            self.webStatus = -1
-        })
+        //     if(code > 0) {
+        //         // 網站維護中
+        //         if(code == 1311003) {
+        //             self.webStatus = 2
+        //         } else {
+        //             // 轉至登入介面
+        //             self.$router.replace({ name: "UserAuth" })
+        //         }
+        //     }
+        //     else {
+        //         // 網站錯誤
+        //         self.webStatus = -1
+        //     }
+        // }).catch(function() {
+        //     // TOMMY
+        //     // console.log(error)
+        //     // 網站錯誤
+        //     self.webStatus = -1
+        // })
     }
 }
 </script>

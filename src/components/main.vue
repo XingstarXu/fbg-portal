@@ -262,7 +262,6 @@
         },
         mounted: function() {
             let self = this
-
             if(self.$cookies.isKey("security_id")) {
                 self.securityID = self.$cookies.get("security_id")
             }
@@ -285,6 +284,8 @@
                 "入倉管理",
                 "轉倉管理",
                 "供應商管理" ,
+                "報銷管理",
+                "資產卡",
                 "測試"
 
             ]
@@ -301,6 +302,8 @@
                 "/asset-sys/Transaction",
                 "/asset-sys/Transfer",
                 "/asset-sys/Vendor",
+                "/asset-sys/Discard",
+                "/asset-sys/Asset",
                 "/test" 
 
             ]

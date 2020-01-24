@@ -7,6 +7,7 @@ Vue.use(VueRouter)
 import Index from "@/components/index"
 import Main from "@/components/main"
 import Profile from "@/components/profile"
+import AssetSysAssetCard from "@/components/Asset_Card_View"
 // UserAuth
 import UserAuth from "@/components/user-auth/user-auth"
 import Login from "@/components/user-auth/login"
@@ -22,7 +23,10 @@ import AssetSysStoreHouse from "@/components/asset-sys/Index/StoreHouse/StoreHou
 import AssetSysTransaction from "@/components/asset-sys/Index/Transaction/Trans_Index"
 import AssetSysTransferTransaction from "@/components/asset-sys/Index/TransferTransaction/Transfer_Index"
 import AssetSysVendor from "@/components/asset-sys/Index/Vendor/Vendor_Index"
-import TST from "@/test/Layout.vue"
+import AssetSysDiscard from "@/components/asset-sys/Index/Discard/Discard_Index"
+import AssetSysAsset from "@/components/asset-sys/Index/Asset/Asset_Index"
+
+import TST from "@/test/main.vue"
 
 
 
@@ -36,10 +40,16 @@ export default new VueRouter({
     routes: [
         // Index
         {
-            path: "",
+            path: "/",
             name: "Index",
             component: Index,
         },
+        {
+            path: "/AssetCard/:id",
+            name:"AssetSysAssetCard",
+            component:AssetSysAssetCard,
+
+        },       
         { // User Auth
             path: "/user-auth",
             name: "UserAuth",
@@ -134,6 +144,18 @@ export default new VueRouter({
                     component:AssetSysVendor
 
                 },
+                {// AssetSys_Discard
+                    path:"/asset-sys/Discard",
+                    name:"AssetSysDiscard",
+                    component:AssetSysDiscard
+
+                },
+                {// AssetSys_Asset
+                    path:"/asset-sys/Asset",
+                    name:"AssetSysAsset",
+                    component:AssetSysAsset
+
+                },                                  
                 {// test
                     path:"/test",
                     name:"test",
@@ -142,6 +164,7 @@ export default new VueRouter({
                 },
 
             ]
-        }
+        },
+
     ]
 })

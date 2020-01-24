@@ -61,7 +61,6 @@ export default {
       isDisabled:false,//控制輸入項是否可以編輯
       editDisable_Disabled:false,//停用項是否可以編輯
       operation:"",//窗體的操作類型 add:新增， update:更改
-      continueSaver:false, //是否繼續保存標示
       options_Vendor:[],
       options_warehouse:[],
       rows:[],
@@ -92,7 +91,6 @@ export default {
         ],
         search:"",
         selected:[],
-        sysSelecteds:[],
         importCount:0,
         parentTable:null,
         searchData:{},
@@ -110,18 +108,8 @@ export default {
       this.selected.forEach(
         item=>{
                 const rowsIds = this.$parent.$refs.child.tableRows.map(rowItem => rowItem.item_id)
-                if(rowsIds.includes(item.item_id))
+                if(!rowsIds.includes(item.item_id))
                 {
-                  for(let i in this.$parent.$refs.child.tableRows){
-                    if(this.$parent.$refs.child.tableRows[i].item_id==item.item_id){
-                      //this.$parent.$refs.child.tableRows[i].qty+=item.qty;
-                      break;
-                    }
-                  }
-
-                }
-                else{
-
                   selItem={"item_id":item.item_id,"item_desc1":item.item_desc1,"item_desc2":item.item_desc2,"warehouse_id":item.warehouse_id,"warehouse_desc1":item.warehouse_desc1,"warehouse_desc2":item.warehouse_desc2,"qty":0,"price":0,amt:0,"remark":"","create_by":""}
                   this.$parent.$refs.child.tableRows.push(selItem)
                   this.importCount=this.importCount+1
@@ -150,7 +138,8 @@ export default {
       this.$parent.$refs.child.tableRows.forEach(
            item=>{
                 this.selected.push(item)
-      });
+      })
+      this.$refs.child.perPage=0
       this.$refs.child.tableConfig.totalRows=this.$refs.child.tableRows.length
       this.$refs.child.tableConfig.totalPage=Math.ceil(this.$refs.child.tableConfig.totalRows / this.$refs.child.tableConfig.perPage)
       
@@ -212,9 +201,6 @@ export default {
                 }
           })
         }
-        this.sysSelecteds=items
-
-
       },
     isSelected(citem){
         let re=false
@@ -304,3 +290,4 @@ export default {
   
 }
 </script>
+

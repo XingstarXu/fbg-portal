@@ -11,12 +11,13 @@
     <StoreHouseTable ref="shTable"/>
     <StoreHouseDialog ref="shDialog"/>
     
+    
 </div>
 </template>
 
 <script>
-import StoreHouseTable from "../../components/StoreHouse/StoreHouse_Table";
-import StoreHouseDialog from "../../components/StoreHouse/StoreHouse_Dialog";
+import StoreHouseTable from "../../components/StoreHouse/StoreHouse_Table"
+import StoreHouseDialog from "../../components/StoreHouse/StoreHouse_Dialog"
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
 
@@ -30,7 +31,8 @@ export default {
             addLink:"http://192.168.12.26:9090/asset-sys/cre-wh/",
             updateLink:"http://192.168.12.26:9090/asset-sys/upd-wh/",
             searchLink:"http://192.168.12.26:9090/asset-sys/sel-wh-for-table/",
-            checkCodeUnique:"http://192.168.12.26:9090/asset-sys/check-wh-code/"
+            checkCodeUnique:"http://192.168.12.26:9090/asset-sys/check-wh-code/",
+            getAssetLink:"http://192.168.12.26:9090/asset-sys/sel-item-warehouse-for-table/"
 
         }
     },

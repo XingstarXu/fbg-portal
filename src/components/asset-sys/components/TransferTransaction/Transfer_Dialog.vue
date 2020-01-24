@@ -16,16 +16,16 @@
                                   <template v-else>
                                         <model-list-select 
                                             :list="options_from_warehouse"  
-                                            v-model.trim="$v.editData.from_wh_id.$model" 
+                                            v-model="editData.from_wh_id" 
                                             :isError= "$v.editData.from_wh_id.$error"             
                                             option-value="warehouse_id"
                                             option-text="warehouse_desc2"
-                                            :isDisabled="isDisabled" 
+                                            :isDisabled="isDisabled||isDisabled_wh_from" 
                                         >                 
                                         </model-list-select>
-                                        <div class="invalid-feedback d-block">
-                                            <span v-if="$v.editData.from_wh_id.$required">原倉庫是必要的</span>
-                                            <span v-if="$v.editData.from_wh_id.isSame">原倉庫與轉至倉庫不能相同</span>
+                                        <div v-if="$v.editData.from_wh_id.$error" class="invalid-feedback d-block">
+                                            <span v-if="!$v.editData.from_wh_id.required">原倉庫是必要的</span>
+                                            <span v-if="!$v.editData.from_wh_id.isSame">原倉庫與轉至倉庫不能相同</span>
                                         </div>                                     
                                   </template>                    
                             </b-col>
@@ -38,22 +38,21 @@
                                   </template>
                                   <template v-else>
                                         <model-list-select :list="options_to_warehouse"  
-                                        v-model.trim="$v.editData.to_wh_id.$model" 
+                                        v-model="editData.to_wh_id" 
                                         :isError= "$v.editData.to_wh_id.$error"             
                                         option-value="warehouse_id"
                                         option-text="warehouse_desc2"
                                         :isDisabled="isDisabled"
-                                        
                                         >                 
                                         </model-list-select>
-                                        <div  class="invalid-feedback d-block">
-                                          <span v-if="$v.editData.to_wh_id.$required">轉至倉庫是必要的</span>
-                                          <span v-if="$v.editData.to_wh_id.isSame">轉至倉庫與原倉庫不能相同</span>
+                                        <div v-if="$v.editData.to_wh_id.$error" class="invalid-feedback d-block">
+                                          <span v-if="!$v.editData.to_wh_id.required">轉至倉庫是必要的</span>
+                                          <span v-if="!$v.editData.to_wh_id.isSame">轉至倉庫與原倉庫不能相同</span>
                                         </div>                                    
                                   </template>                        
                             </b-col>                     
                       </b-row>
-                      <b-row class="mb-3">
+                      <!-- <b-row class="mb-3">
                             <b-col lg="2" style="text-align:right">
                                   轉倉日期:                       
                             </b-col>  
@@ -75,7 +74,7 @@
                             </b-col>                   
                             <b-col lg="3">
                             </b-col> 
-                      </b-row>
+                      </b-row> -->
 
                       <b-row align-h="start" class="mb-3">
                             <b-col lg="2" style="text-align:right">
@@ -98,7 +97,7 @@
                   <b-row class="mb-3" >
                       <b-col>
                           <template v-if="!isDisabled">
-                              <b-button variant="success" align="right" @click="showNewDialog" :disabled="isDisabled">
+                              <b-button variant="success" align="right" @click="showNewDialog" :disabled="isDisabled||isEditRow">
                                   <i class="far fa-plus-square"></i> 
                                   新增轉倉資產
                               </b-button> 
@@ -116,24 +115,14 @@
                   </template>
                   <template v-else>
                         <template v-if="isDisabled==false">
-                              <b-button  variant="info" @click="editRow(myData)" id="v1" size="sm" :disabled="isDisabled">編輯</b-button> 
-                              <b-button class="ml-3" variant="danger" @click="deleteShow(myData)" id="v1" size="sm" :disabled="isDisabled">刪除</b-button>
+                              <b-button  variant="info" @click="editRow(myData)" id="v1" size="sm" :disabled="isDisabled||isEditRow">編輯</b-button> 
+                              <b-button class="ml-3" variant="danger" @click="deleteShow(myData)" id="v1" size="sm" :disabled="isDisabled||isEditRow">刪除</b-button>
                         </template>
                   </template>
 
           </template>
 
-
-          <template v-slot:diyColumn2="myData2">
-                <template v-if="isEdit(myData2.data.index)">
-                      <b-form-input v-model="myData2.data.item.qty" size="sm" @change="amtChange(myData2.data.item)" type="number"></b-form-input>
-                </template>
-                <template v-else>
-                      <p>{{myData2.data.item.qty}}</p>   
-                </template>
-          </template>
-
-          <template v-slot:diyColumn3="myData3">
+         <template v-slot:diyColumn3="myData3">
                 <template v-if="isEdit(myData3.data.index)">
                       <b-form-input v-model="myData3.data.item.remark" size="sm" ></b-form-input>
                 </template>
@@ -197,47 +186,34 @@ export default {
     return{
       saveText:"保存",//保存制名稱
       isSaveDisabled:false,//保存制禁用標識
-      editData:{
-              transfer_header_id:"",
-              transfer_code:"",
-              from_wh_id:"",
-              from_wh_desc1:"",
-              from_wh_desc2:"",
-              to_wh_id:"",
-              to_wh_desc1:"",
-              to_wh_desc2:"",
-              transfer_date:"",
-              remark:"",
-              qty:0,
-              disable:0,
-              update_by:"",
-              create_by:""
-        
-      },
-      editItem:{
-              editIndex:-1,
-              remarkValue:"",
-              qtyValue:0,
-      },
-
+      parentTable:null,//父窗體
+      delMsg:"",//刪除提示信息
       isDisabled:false,//控制輸入項是否可以編輯
-      editDisable_Disabled:false,//停用項是否可以編輯
-      operation:"",//窗體的操作類型 add:新增， update:更改
-      continueSaver:false, //是否繼續保存標示
+      operation:"",//窗體的操作類型 add:新增， update:更改      
+      isEditRow:false,//編輯狀態標記
+      isDisabled_wh_from:false,//原倉庫的編輯標識，若已選擇了原倉庫并加入資產后，即會變成無效狀態編輯（tre)。
+      editData:{},//表頭資訊集
+      details_data:{},//明細資訊集
+      deleteItem:{},//刪除行的資訊集
+      editItem:{},//需要的編輯行資訊集
       options_from_warehouse:[],
       options_to_warehouse:[],
-      detailsRows:[],
       columns: [
-
+            {
+                label: "資產編號",
+                key: "asset_code",
+                sortable: true,
+            },
             {
                 label: "資產名稱",
                 key: "item_desc2",
                 sortable: true,
             },
             {
-                label:"數據量",
-                key:"editColumn"
-            },
+                label:"現存倉庫",
+                key:"warehouse_desc2"
+            },            
+
             {
                 label:"備註",
                 key:"editColumn2"
@@ -249,63 +225,12 @@ export default {
             }
         ],
 
-        header_new:{
-                from_wh_id:"",
-                from_wh_desc1: "",
-                from_wh_desc2: "",
-                to_wh_id:"",
-                to_wh_desc1: "",
-                to_wh_desc2: "", 
-                transfer_date: "",               
-                qty:0,
-                remark:"",
-                create_by: ""
-              },
-           
-        details_new:{
-                
-                item_id: "",
-                item_desc1: "",
-                item_desc2: "",
-                qty: 0,
-                remark: "",
-                create_by: ""
-               },
-          header_update:{
-                _id:"",
-                code:"",
-                transfer_date: "",
-                from_wh_id:"",
-                from_wh_desc1: "",
-                from_wh_desc2: "",
-                to_wh_id:"",
-                to_wh_desc1: "",
-                to_wh_desc2: "",  
-                qty:0,
-                remark:"",
-                update_by: ""
-              },                
-          details_update:{
-                transfer_details_id:"",
-                item_id: "",
-                item_desc1: "",
-                item_desc2: "",
-                qty: 0,
-                remark: "",
-                update_by: ""
-               },
-          parentTable:null,
-          delMsg:"",
-          deleteItem:{}
-
-      
-
-
     }
   },
   methods:{
     saveData(){
-      this.$v.$touch()
+      this.$v.$touch()//驗證數據
+      //判斷是否有效的數據，如果存在無效的數據即會作出相應的提示及不會進行保存
       if(this.$v.$invalid){
             
             return;
@@ -320,231 +245,95 @@ export default {
             return;
 
         }
-        //檢查明細資料的完整性
-        this.$refs.child.tableRows.forEach(trItem=>{
-             if(trItem.qty<=0){
-                invalidText="資料未完整，請在紅色提示處錄入完整數據!"
-                detailesInvalid=true;
 
-              }
-          })
           if(detailesInvalid){
              this.$refs.child.showAlert(invalidText,"danger");
             return;
           }
 
-          this.$refs.child.confirmData();//調用公用窗體的confirmData方法，用禁用相關的按鈕。
-          this.$parent.isLoading=true;//啟動加載頁面
-          this.saveText="Saveing...";//保存制正在保存中的字樣
-          this.isSaveDisabled=true;//禁用保存制
           switch(this.operation)
           {
             case "add":
-              
               this.addData();
-
               break;
-            case "update":
-              this.updateData();
-              break;
-
 
           }
       }
     },
-    beforeOpen(){
-        this.$v.$reset();
-        this.$refs.child.dialogSize="xl"
-        this.$refs.child.tableColumns=this.columns
-        let newDate=new Date()
-        switch (this.operation) {
-         case "add": //如果是新增時初始化變量
-            this.editData={
-              transfer_header_id:"",
-              transfer_code:"",
-              from_wh_id:"",
-              from_wh_desc1:"",
-              from_wh_desc2:"",
-              to_wh_id:"",
-              to_wh_desc1:"",
-              to_wh_desc2:"",
-              transfer_date:newDate.toISOString().slice(0,10),
-              remark:"",
-              qty:0,
-              disable:0,
-              update_by:"",
-              create_by:""
-            }
-
-            this.isSaveDisabled=false;
-            this.editDisable_Disabled=true; 
-            this.$refs.child.tableRows=[];  
-            this.isDisabled=false; //默認請況所有控件可以編輯         
-            break;
-          case "detalis": //如果是查詢詳細即禁止編輯
-            this.isDisabled=true; 
-            this.isSaveDisabled=true;//保存制禁用標識            
-            break;
-
-          default:
-            this.isSaveDisabled=false;//保存制禁用標識  
-            this.isDisabled=false; //默認請況所有控件可以編輯 
-            this.editDisable_Disabled=false;   
-            this.continueSaver=false;
-            break;
-        }
-
-        this.badingData();
-        this.getWareHouse();
-  
-       
-
-    },
+    
     setData(editRow,detailes){
-      //editRow.vendor_id.replace(/-/g,''),
           this.editData={
-                    transfer_header_id: editRow.transfer_header_id,
-                    transfer_code: editRow.transfer_code,
-                    trans_date: editRow.trans_date,
-                    from_wh_id: editRow.from_wh_id,
-                    from_wh_desc1: editRow.from_wh_desc1,
-                    from_wh_desc2: editRow.from_wh_desc2,
-                    to_wh_id: editRow.to_wh_id,
-                    to_wh_desc1: editRow.to_wh_desc1,
-                    to_wh_desc2: editRow.to_wh_desc2,
-                    remark: editRow.remark,
-                    qty: editRow.qty,
-                    disable: editRow.disable,
-                    update_by: editRow.update_by
-                   
-
-
+              transfer_header_id:editRow.transfer_header_id,
+              transfer_code:editRow.transfer_code,
+              from_wh_id:editRow.from_warehouse_id,
+              from_wh_desc2:editRow.from_warehouse_desc2,
+              to_wh_id:editRow.to_warehouse_id,
+              to_wh_desc2:editRow.to_warehouse_desc2,
+              transfer_date:editRow.transfer_date,
+              remark:editRow.remark,
+              void:0,
+              update_by:editRow.update_by,
+              create_by:editRow.create_by                
           };
           this.$refs.child.tableRows=[]
           detailes.forEach(dItem=>{
-                                  this.details_update={
-                                        transfer_id:dItem.transfer_id,
-                                        item_id: dItem.item_id,
-                                        item_desc1: dItem.item_desc1,
+                                  this.details_data={
+                                        asset_id: dItem.asset_id,
+                                        asset_code: dItem.asset_code,
                                         item_desc2: dItem.item_desc2,
-                                        qty: dItem.qty,
+                                        warehouse_desc2:dItem.warehouse_desc2,
                                         remark: dItem.remark,
                                         update_by: dItem.update_by
                                   }
-                                  this.$refs.child.tableRows.push(this.details_update)
+                                  this.$refs.child.tableRows.push(this.details_data)
 
 
           })
 
 
     },
-
+    //保存新增數據
     addData(){
         let self=this;
         //Header處理
-          //獲取原倉庫的名稱資訊
-          this.options_from_warehouse.forEach(
-              fromItem=>{
-                  if(fromItem.from_wh_id==this.editData.from_wh_id)
-                  {
-                        this.editData.from_wh_desc1=fromItem.from_wh_desc1
-                        this.editData.from_wh_desc2=fromItem.from_wh_desc2
-                  }
-          })
-          //獲取轉至倉的名稱資訊
-          this.options_to_warehouse.forEach(
-              toItem=>{
-                  if(toItem.to_wh_id==this.editData.to_wh_id){
-                    this.editData.to_wh_desc1=toItem.to_wh_desc1
-                    this.editData.to_wh_desc2=toItem.to_wh_desc2
-                  }
-          })
+        //Header表取值
+        let header_new={
+                from_warehouse_id:this.editData.from_wh_id,
+                to_warehouse_id:this.editData.to_wh_id,          
+                remark:this.editData.remark,
+                void:this.editData.void,
+                create_by:"jx.xu"
+              };
+        //Details表取值
+        let detailsRows=this.$refs.child.tableRows
 
-          //Header表取值
-          this.header_new={
-                  from_wh_id:this.editData.from_wh_id,
-                  from_wh_desc1:this.editData.from_wh_desc1,
-                  from_wh_desc2:this.editData.from_wh_desc2,
-                  to_wh_id:this.editData.to_wh_id,
-                  to_wh_desc1:this.editData.to_wh_desc1,
-                  to_wh_desc2:this.editData.to_wh_desc2, 
-                  transfer_date:this.editData.transfer_date,               
-                  qty:0,
-                  remark:this.editData.remark,
-                  create_by:"jx.xu"
-                };
-          //Details表取值
-          this.detailsRows=this.$refs.child.tableRows
-          this.detailsRows.forEach(
-               detilsItem=>{
-                    //統計入倉總數量
-                    this.header_new.qty=Number(this.header_new.qty)+Number(detilsItem.qty);            
-          })  
- 
+        //獲取安全Cookies
+        let securityID=""
+        if(self.$cookies.isKey("security_id")) {
+            securityID = self.$cookies.get("security_id")
+        }
+        else {
+            // 轉至「登入」頁面
+            self.$router.replace("/login")
+            return
+        }
+
           let saveData={
-                          "header":self.header_new,
-                          "details":self.detailsRows
+                          "website_code": "WEB01",
+                          "security_id": securityID,            
+                          "header": header_new,
+                          "details": detailsRows
 
           }
-          
+
+        
          let s=this.$refs.child.saveData(this,this.$parent.addLink,saveData)
          if (s==1){
            this.beforeOpen()
          }
           
       },
-    updateData(){
-        let self=this;
-        //Header處理
-          //獲取原倉庫的名稱資訊
-          this.options_from_warehouse.forEach(
-               fromItem=>{
-                    if(fromItem.from_wh_id==this.editData.from_wh_id)
-                    {
-                      this.editData.from_wh_desc1=fromItem.from_wh_desc1;
-                      this.editData.from_wh_desc2=fromItem.from_wh_desc2;
-                    }
-          })
-          //獲取轉至倉的名稱資訊
-          this.options_to_warehouse.forEach(
-               toItem=>{
-                    if(toItem.to_wh_id==this.editData.to_wh_id)
-                    {
-                      this.editData.to_wh_desc1=toItem.to_wh_desc1;
-                      this.editData.to_wh_desc2=toItem.to_wh_desc2;
-                    }
-          })
-          //Header表更新
-          this.header_update={
-                  from_wh_id: this.editData.from_wh_id,
-                  from_wh_desc1: this.editData.from_wh_desc1,
-                  from_wh_desc2: this.editData.from_wh_desc2,
-                  to_wh_id: this.editData.to_wh_id,
-                  to_wh_desc1: this.editData.to_wh_desc1,
-                  to_wh_desc2: this.editData.to_wh_desc2, 
-                  transfer_code: this.editdata.transfer_code,
-                  transfer_date: this.editData.transfer_date,               
-                  qty:0,
-                  remark:this.editData.remark,
-                  update_by:"jx.xu"
-                };
-          //Details表取值
-          this.detailsRows=this.$refs.child.tableRows;
-          this.detailsRows.forEach(
-               detilsItem=>{
-                    //統計入倉總數量
-                    this.header_update.qty=Number(this.header_update.qty)+Number(detilsItem.qty);
-
-          })
-
-          let saveData={
-                        "header":self.header_update,
-                        "details":self.detailsRows
-          }
-          
-         this.$refs.child.saveData(this,self.header_update,saveData)          
-      }, 
-
+      //獲取倉庫信息
       getWareHouse(){
         let self=this;
         this.$http.post(this.$parent.getWareHouseLink,{"disable":0}
@@ -562,80 +351,17 @@ export default {
                         }
                       )
       },
-      badingData(){
-      },
-      showNewDialog(){
-         this.$bvModal.show('TransferItemDialog');
-      },     
-      onRowClicked(){
-      },
-      onRowSelected(){
 
-      },
-      isSelected(){
 
-      },
-      pageChange(){
-          this.editIndex=-1;
-          this.$refs.child.$refs.selectTable.clearSelected();
-      },
-      editRow(item){
-       
-          this.editItem.editIndex=item.data.index;
-          this.editItem.qtyValue=item.data.item.qty;
-          this.editItem.remarkValue=item.data.item.remark;
-          
-          if(this.$refs.child.isRowSelected(item.data.index))
-          {
-             
-            this.$refs.child.unselectRow(item.data.index);
-          }
-          else{
-            this.$refs.child.selectRow(item.data.index);
-
-          }
-        
-      },
+      //判斷是否編輯狀態
       isEdit(index){      
           return this.editItem.editIndex==index
       },
-       editRowOK(item){
-          this.editItem.editIndex=-1;
-          this.$refs.child.unselectRow(item.data.index);
-          this.$refs.child.selectRow(item.data.index);
-      },
-      editRowCancel(item){
-          this.editItem.editIndex=-1;
-          //預先保存原有的值
-          item.data.item.qty=this.editItem.qtyValue;
-          item.data.item.remark=this.editItem.remarkValue;
 
-          //清空臨時值
-          this.editItem.qtyValue=0;
-          this.editItem.remarkValue="";
-
-          this.$refs.child.unselectRow(item.data.index);
-          this.$refs.child.selectRow(item.data.index);
-        
-
-      },
-      rowClass(item){
-            if (!item) return
-            if (item.warehouse_id===undefined || item.qty<=0){
-                return 'table-danger'
-            } 
-
-      },
-
-      amtChange(item){
-        item.qty=Number(item.qty);
-      
-
-      },
       //顯示刪除對話框
-      deleteShow(delItem){       
+      deleteShow(delItem){
         this.deleteItem=delItem.data.item
-        this.delMsg="是否移除【"+this.deleteItem.item_desc2+"】這條項目？"
+        this.delMsg="是否移除【"+this.deleteItem.asset_code+"】這條項目？"
         this.$bvModal.show('ItemDele')
 
       },
@@ -643,7 +369,7 @@ export default {
       deleteRow(){
         for(let i in this.$refs.child.tableRows)
         {
-               if(this.deleteItem.item_id==this.$refs.child.tableRows[i].item_id)
+               if(this.deleteItem.asset_id==this.$refs.child.tableRows[i].asset_id)
                {
                   this.$refs.child.tableRows.splice(i, 1)
                }
@@ -654,20 +380,121 @@ export default {
         this.$refs.child.tableConfig.totalPage=Math.ceil(this.$refs.child.tableConfig.totalRows / this.$refs.child.tableConfig.perPage)
         this.$refs.delItem.closeDialog()
       },
+      //顯示新增窗口
+      showNewDialog(){
+        this.$v.editData.from_wh_id.$touch()
+        //驗證是否有選擇原倉庫，如果沒有選擇則不能添加資產。
+        if(!this.$v.editData.from_wh_id.$error)
+        {
+          this.$refs.ttItemDialog.search.warehouseId=this.editData.from_wh_id
+          this.$bvModal.show('TransferItemDialog')
+          this.$refs.ttItemDialog.badingData()
+        }
+      },
+
+
+      //判斷是否選擇相同的倉庫
       isWHSame(value){
           let se=this
           let isSelectSame=true
-          if (value === '') return false
-          if(this.editData.from_wh_id==this.editData.to_wh_id & se.operation=="add")
-          {
-            isSelectSame=true  
-          }
-          else
-          {
-            isSelectSame=false 
+          if (value != '') {
+              if(this.editData.from_wh_id==this.editData.to_wh_id & se.operation=="add")
+              {
+                isSelectSame=false  
+              }
+              else
+              {
+                isSelectSame=true 
+              }
           }
           return Boolean(isSelectSame)
-      }
+      },
+
+//公共插件提供的公用方法>>>>>>
+      
+      beforeOpen(){
+          this.$v.$reset();
+          this.$refs.child.dialogSize="xl"
+          this.$refs.child.tableColumns=this.columns
+          this.parentTable=this.$parent.$refs.ttTable 
+          this.isSaveDisabled=false//保存制禁用標識  
+          this.isDisabled=false //默認請況所有控件可以編輯 
+          this.isDisabled_wh_from=false
+          this.isEditRow=false
+          this.$refs.child.perPage=5//設置為不是自動分頁
+          switch (this.operation) {
+          case "add": //如果是新增時初始化變量
+              this.editData={
+                transfer_header_id:"",
+                transfer_code:"",
+                from_wh_id:"",
+                from_wh_desc2:"",
+                to_wh_id:"",
+                to_wh_desc2:"",
+                transfer_date:"",
+                remark:"",
+                void:0,
+                update_by:"",
+                create_by:""
+              }
+
+              this.editItem={
+                editIndex:-1,
+                remarkValue:""
+              }
+              this.$refs.child.tableRows=[]  
+              break;
+            case "detalis": //如果是查詢詳細即禁止編輯
+              this.isDisabled=true
+              this.isSaveDisabled=true//保存制禁用標識            
+              break;
+          }
+          this.$refs.child.tableConfig.totalRows=this.$refs.child.tableRows.length
+          this.$refs.child.tableConfig.totalPage=Math.ceil(this.$refs.child.tableConfig.totalRows / this.$refs.child.tableConfig.perPage)    
+          this.getWareHouse();
+      },
+      
+      editRow(item){
+          this.editItem.editIndex=item.data.index;
+          this.editItem.remarkValue=item.data.item.remark;
+          if(this.$refs.child.isRowSelected(item.data.index))
+          {
+             
+            this.$refs.child.unselectRow(item.data.index);
+          }
+          else{
+            this.$refs.child.selectRow(item.data.index);
+
+          }
+          this.isEditRow=true
+        
+      },
+
+      editRowOK(item){
+          this.editItem.editIndex=-1;
+          this.$refs.child.unselectRow(item.data.index);
+          this.$refs.child.selectRow(item.data.index);
+          this.isEditRow=false
+      },
+      editRowCancel(item){
+          this.editItem.editIndex=-1;
+          //預先保存原有的值
+          item.data.item.remark=this.editItem.remarkValue;
+          //清空臨時值
+          this.editItem.remarkValue="";
+          this.$refs.child.unselectRow(item.data.index);
+          this.$refs.child.selectRow(item.data.index);
+          this.isEditRow=false
+
+      },
+      rowClass(item){
+            if (!item) return
+      },
+      onRowClicked(){},
+      onRowSelected(){},
+      isSelected(){},
+      badingData(){},
+//<<<<<公共插件提供的公用方法
 
   },
   components:{
@@ -699,16 +526,7 @@ export default {
              return  this.isWHSame(value)
         }
       },     
-      transfer_date:{
-        required,
-
-      },
-      invoice_no:{
-        required
-
-      }
-
-     
+    
                       
     },
 

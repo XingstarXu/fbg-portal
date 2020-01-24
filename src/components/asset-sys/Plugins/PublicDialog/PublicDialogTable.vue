@@ -1,7 +1,7 @@
 <template>
 <div>
   
-  <b-modal :id="myModalDialog" content-class="shadow" :title="modal_titel" @show="beforeOpen" @hide="cardCloseDo" 
+  <b-modal :id="myModalDialog"  @show="beforeOpen" @hide="cardCloseDo" 
                             @close="closeDialog" 
                             :cancel-disabled="cancelDisabled"
                             :cancel-title="cancelText"
@@ -11,7 +11,7 @@
                             header-text-variant="light"
                             >
 
-      <b-container class="bv-example-row">
+      <b-container class="bv-example-row font">
         <b-row>
           <b-col>
            <slot name="body"></slot>
@@ -47,7 +47,8 @@
               :select-mode="selectMode"
               @row-clicked="onRowClicked"
               @row-selected="onRowSelected"
-
+              :per-page="perPage"
+              :current-page="tableConfig.currentPage"
               @change="pageChange"            
               ref="selectTable"
              
@@ -118,7 +119,14 @@
                   <template v-slot:foot(footCloumn1)="data">
                     <slot name="footColumn1" v-bind="{data}">
                     </slot>
-                  </template>                                                                  
+                  </template>
+                  <!--詳細內容-->
+                  <template v-slot:row-details="data">
+                    <slot name="detailsRow" v-bind="{data}">
+                    </slot>
+
+                  </template>                 
+
 
               </b-table>  
           </b-col>
@@ -133,40 +141,45 @@
 
       </b-container>
 
-     <div slot="modal-footer" class="w-100" >
-       <b-container>
-         <b-row>
-           <b-col cols="2" style="text-align:left">
-              <b-button
-                variant="danger"
-                size="md"
-                class="float-left"
-                :disabled="cancelDisabled"
-                @click="closeDialog"
+      <template v-slot:modal-title class="font">
+        <div class="font title">
+            {{modal_titel}}
+        </div>
+      </template> 
+      <div slot="modal-footer" class="w-100 font" >
+        <b-container>
+          <b-row>
+            <b-col cols="2" style="text-align:left">
+                <b-button
+                  variant="danger"
+                  size="md"
+                  class="float-left"
+                  :disabled="cancelDisabled"
+                  @click="closeDialog"
+                  >
+                    關閉
+                </b-button>
+            </b-col>
+            <b-col cols="8" style="text-align:center">
+                <b-alert
+                  :show="dismissCountDown"
+                  dismissible
+                  :variant="alert_variant"
+                  @dismissed="dismissCountDown=0"
+                  @dismiss-count-down="countDownChanged"
                 >
-                  關閉
-              </b-button>
-           </b-col>
-           <b-col cols="8" style="text-align:center">
-              <b-alert
-                :show="dismissCountDown"
-                dismissible
-                :variant="alert_variant"
-                @dismissed="dismissCountDown=0"
-                @dismiss-count-down="countDownChanged"
-              >
-                {{alert_text}} {{ dismissCountDown }} seconds...
-              </b-alert>
-           
-           </b-col>
-           <b-col cols="2" style="text-align:right">
-              <slot name="okbutten">
-                
-              </slot>
-           </b-col>
-          </b-row>
-        </b-container>
-      </div>
+                  {{alert_text}} {{ dismissCountDown }} seconds...
+                </b-alert>
+            
+            </b-col>
+            <b-col cols="2" style="text-align:right">
+                <slot name="okbutten">
+                  
+                </slot>
+            </b-col>
+            </b-row>
+          </b-container>
+        </div>
 
   </b-modal>
 </div>
@@ -204,25 +217,36 @@ export default {
       myModalDialog:"ModalDialog",
       selectMode:"multi",
       isSelectAll:0,
+      perPage:0,//用於是否使用表的自動分頁功能
+      isPageChange:false
     }
   },
   methods:{
     //打開對話框前
     beforeOpen (e) {  
+
+       this.initData()
+       this.$parent.beforeOpen(e)//調用父窗體的方法，用來處理不同窗體特有的處理
+    },
+
+    initData(){
        this.isAoutoClose=false//設置為手動關閉標識（false:手動關閉）
        this.cancelDisabled=false//禁用Cancel制標識
        this.isHideCloseButten=false//顯示關閉制標識
-       this.$parent.beforeOpen(e)//調用父窗體的方法，用來處理不同窗體特有的處理
        this.dismissCountDown=0//初始化提示的顯示
-       
+       this.perPage=5//初始化是否自動分頁標識（0：自動分頁 >0：DB分頁【默認】）
+       this.isPageChange=false//分頁改變標識，用於判斷是否分頁分頁而引起的查詢。
     },
-      //關閉對話框前時的處理
+
+    //關閉對話框前時的處理
     cardCloseDo(bvModalEvt){
           if(!this.isAoutoClose)//如果不是手動關閉即不會關閉對話框（即防止點擊背景時自動關閉）
           {
             bvModalEvt.preventDefault()
               return
           }
+          this.initData()//初始化數據
+          
 
       },
       //手動關閉對話框
@@ -253,7 +277,6 @@ export default {
         },
     saveData(controlDialog,saveLink,saveData){
             let self=this
-            let run=0
             this.closeControl(controlDialog)//調用公用窗體的confirmData方法，用禁用相關的按鈕。         
             this.$http.post(saveLink,
                             saveData)
@@ -261,7 +284,7 @@ export default {
                               if(response.data.code>0)
                               {
                                 self.showAlert(response.data.msg,"success")
-                                run=1
+                                
 
                               }
                               else{
@@ -279,7 +302,7 @@ export default {
                               self.openConterl(controlDialog)//調用公用窗體的closeConfirm方法，用啟用相關的按鈕。
                               controlDialog.parentTable.textSearch()
                           })
-            return run
+
         },
 
 
@@ -291,17 +314,57 @@ export default {
           this.alert_text=showText
           this.alert_variant=showVariant
         },
-    badingData(){
-        //console.clear()
-        this.$parent.badingData()//調用父級的綁定數據方法，以應用不同的處理。
+    badingData(publicTable){
+          let self=this
+          let searchLink=publicTable.searchLink
+          let searchData=publicTable.searchData
+          publicTable.$parent.isLoading=true
+          
+          //獲取安全Cookies
+          let securityID=""
+          if(this.$cookies.isKey("security_id")) {
+              securityID = self.$cookies.get("security_id")
+          }
+          else {
+              // 轉至「登入」頁面
+              self.$router.replace("/login")
+              return
+          }   
+          //當加載數據時，如果不是改變當前頁時的即將當前頁還原為第一頁。解決查詢數據時當前頁沒有改變的問題。
+          if(!this.isPageChange){
+              self.tableConfig.currentPage=1            
+          }
+          this.isPageChange=false
+          searchData.security_id=securityID
+          searchData.website_code="WEB01"
+          searchData.page=self.tableConfig.currentPage
+          searchData.num_of_page=self.tableConfig.perPage,          
+          this.$http.post(searchLink,searchData)
+                      .then(function(response){
+                          let res=response.data
+                          self.tableRows = res.data
+                          publicTable.$parent.isLoading=false
+                          self.tableConfig.totalPage=res.total_page
+                          self.tableConfig.totalRows=res.records
+
+                      })
+                      .catch(function(){
+                          //console.log(error);
+                          publicTable.$parent.isLoading=false
+                      })
        },
     rowClass(item) {
          return this.$parent.rowClass(item)
        },
 
     pageChange (page) {
-        this.tableConfig.currentPage = page;
-        this.$parent.textSearch(); //調用父級的查詢方法，以應用不同的處理。
+      this.tableConfig.currentPage = page;
+      this.isPageChange=true
+      //如果不是自動分頁，則需要從DB獲取數據
+      if(this.perPage===0){       
+        this.$parent.textSearch(); 
+      }
+
       },       
 // 處理已選擇行的記錄。刪除已選擇行的記錄
     onRowClicked(item){
@@ -338,3 +401,21 @@ export default {
   
 }
 </script>
+<style lang="css" scoped>
+    /* For modal */
+    @import url(
+        "https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap&subset=chinese-traditional"
+    );
+
+    .font {
+        font-family: "Noto Sans TC", sans-serif;
+    }
+
+    .label {
+        font-size: 20px;
+    }
+
+    .title {
+        font-size: 30px;
+    }
+</style>

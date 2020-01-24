@@ -62,7 +62,7 @@ export default {
 
                         {
                             label: "入倉單號",
-                            key: "header.code",
+                            key: "header.trans_code",
                             sortable: true,
                         },                     
                         {
@@ -134,8 +134,22 @@ export default {
        },
 
       textSearch(){
+
+            //獲取安全Cookies
+            let securityID=""
+            if(self.$cookies.isKey("security_id")) {
+                securityID = self.$cookies.get("security_id")
+            }
+            else {
+                // 轉至「登入」頁面
+                self.$router.replace("/login")
+                return
+            }
+
             this.searchLink=this.$parent.searchLink
             this.searchData={
+                    "website_code": "WEB01",
+                    "security_id" : securityID,
                     "page":this.$refs.child.config.currentPage,
                     "num_of_page":this.$refs.child.config.perPage,
                     "search":this.searchText,
@@ -167,6 +181,11 @@ export default {
 
       },
 
+      setValue(){
+          this.textSearch()
+
+      }
+
     },
     components:{
 
@@ -193,9 +212,4 @@ export default {
     
 }
 </script>
-<style lang="scss">
-#columnDispay{
-  display: none
-}
 
-</style>

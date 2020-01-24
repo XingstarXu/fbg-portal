@@ -118,27 +118,15 @@
                   label-align-sm="right"
                   class="mb-0"
              >
-             <div class="clearfix">
-                 
-                  
-                  <b-img thumbnail fluid :src="photoBase64" alt="assets photo" ></b-img>
-                  <b-form-file
-                     v-model="photoFile"
-                     :state="Boolean(photoFile)"
-                     placeholder="Choose a file or drop it here..."
-                     drop-placeholder="Drop file here..."
-                     accept=".jpg, .png, .gif"
-                     :file-name-formatter="formatNames"
-                     @change="previewImage"
-                  >
-                  
-                  </b-form-file>
-                  <!-- {{editData.photoFile?editData.photoFile.name:"NULL"}} -->
-                <div v-if="photoError" class="invalid-feedback d-block">
-                   <span>{{photoErrorText}}</span>
-                </div>
+             <UpdateFile ref="uplodImage"/>
+             <!--如果有員工圖片時才會顯示image框-->
+             <div v-if="editData.img!=''">
+               <b-img width="120" height="120" :src="getImage(editData.img)">
+
+               </b-img>
 
              </div>
+
              </b-form-group>
 
           </template>
@@ -161,6 +149,7 @@
 </div>
 </template>
 <script>
+import UpdateFile from './update-file'
 import { required } from 'vuelidate/lib/validators'
 import { ModelListSelect } from 'vue-search-select'
 // import { saveAs } from 'file-saver'
@@ -222,52 +211,56 @@ export default {
               this.continueSaver=false
             }
 
-            this.addData={   "item_desc1":this.editData.item_desc1, 
-                             "item_desc2":this.editData.item_desc2, 
-                             "qty":this.editData.qty, 
-                             "unit_id":this.editData.unit_id, 
-                             "type_id":this.editData.type_id, 
-                             "model_no":this.editData.model_no, 
-                             "img":this.editData.img, 
-                             "iso":this.editData.iso,
-                             "create_by":"jx.xu" 
-                         }
-            this.updateData={
-                              "item_id":this.editData.item_id,
-                              "item_desc1":this.editData.item_desc1,
-                              "item_desc2":this.editData.item_desc2, 
-                              "item_code":this.editData.item_code,
-                              "qty":this.editData.qty, 
-                              "unit_id":this.editData.unit_id, 
-                              "type_id":this.editData.type_id, 
-                              "model_no":this.editData.model_no, 
-                              "img":this.editData.img, 
-                              "iso":this.editData.iso,
-                              "update_by":"jx.xu"        
-                            }   
-           // if(this.photoFile){
-          //       var fn=this.photoFile.name;
-          //       //fn=response.data.item_code+fn.substring(fn.indexOf("."))
-          //       fn="/assetsPhoto/"+'test.jpg'
-          //       var FileSaver = require('file-saver');
-          //       FileSaver.saveAs(this.photoFile, fn);
+            //獲取安全Cookies
+            let self=this
+            let securityID=""
+            if(self.$cookies.isKey("security_id")) {
+                securityID = self.$cookies.get("security_id")
+            }
+            else {
+                // 轉至「登入」頁面
+                self.$router.replace("/login")
+                return
+            }
+            //獲鄧上傳的圖片
+            this.editData.img=this.$refs.uplodImage.image
 
-          // }                           
-                            
+            let formData = new FormData()                       
+ 
             switch(this.operation)
             {
               case "add":
-                this.$refs.child.saveData(this,this.$parent.addLink,this.addData)
+                formData.append("website_code", "WEB01")
+                formData.append("security_id", securityID)
+                formData.append("item_desc1", this.editData.item_desc1)
+                formData.append("item_desc2", this.editData.item_desc2)
+                formData.append("unit_id", this.editData.unit_id)
+                formData.append("type_id", this.editData.type_id)
+                formData.append("model_no", this.editData.model_no)
+                formData.append("img", this.editData.img)
+                formData.append("iso", this.editData.iso)
+                this.$refs.child.saveData(this,this.$parent.addLink,formData,{"Content-Type": "multipart/form-data"})
                 //self.savePhoto()
 
                 break;
               case "update":
-                this.$refs.child.saveData(this,this.$parent.updateLink,this.updateData)
+                formData.append("website_code", "WEB01")
+                formData.append("security_id", securityID)
+                formData.append("item_id", this.editData.item_id)
+                formData.append("item_desc1", this.editData.item_desc1)
+                formData.append("item_desc2", this.editData.item_desc2)
+                formData.append("unit_id", this.editData.unit_id)
+                formData.append("type_id", this.editData.type_id)
+                formData.append("model_no", this.editData.model_no)
+                formData.append("img", this.editData.img)
+                formData.append("iso", this.editData.iso)
+                this.$refs.child.saveData(this,this.$parent.updateLink,formData,{"Content-Type": "multipart/form-data"})
                 //self.savePhoto()
                 break;
 
 
             }
+            this.editData.img=""//清空原有的圖片，以更新圖片顯示
         }
     },
 
@@ -278,6 +271,7 @@ export default {
       this.$parent.isLoading=false
       this.editDisable_Disabled=false
       //this.parentTable=this.$parent.$refs.itTable 
+      
       if(this.operation=="add")
       {
           this.editData={
@@ -289,16 +283,14 @@ export default {
                           type_id:"",
                           model_no:"",
                           iso:0,
-                          img:"1000006.jpg",
+                          img:"",
                           qty:0
 
                         }
           this.isDisabled=false
           this.editDisable_Disabled=true
       }
-      //靜態資源文件需要放在public文件夾中才能動態讀取到。
-      this.photoPath="/assetsPhoto/"+this.editData.img
-      this.photoBase64=this.photoPath
+
       this.getType()
       this.getUnit()
 
@@ -356,7 +348,6 @@ export default {
                           qty:editRow.qty
 
                         }
-
     },
     formatNames(files){
       if(files.length===1){
@@ -408,10 +399,14 @@ export default {
     setModalDialogName(strName){
        this.$refs.child.myModalDialog=strName
      },
+    getImage(img){
+          return "data:image/jpeg;base64," + img
+    }
  
   },
   components:{
-    ModelListSelect
+    ModelListSelect,
+    UpdateFile
   },
   mounted(){
     this.$refs.child.modal_titel="資產管理"

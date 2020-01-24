@@ -7,7 +7,7 @@
                   <b-row class="mb-3">
                     <b-col>
                         <b-input-group prepend="搜索" class="mt-3" label-cols-sm="4">
-                              <b-form-input v-model="search"></b-form-input>
+                              <b-form-input v-model="search.searchText"></b-form-input>
                               <b-input-group-append>
                               <b-button variant="outline-success" @click="textSearch" >Search</b-button>
                               </b-input-group-append>
@@ -62,7 +62,7 @@ export default {
             },
             {
                 label: "資產號",
-                key: "item_code",
+                key: "asset_code",
                 sortable: true,
             },
             {
@@ -71,22 +71,31 @@ export default {
                 sortable: true,
             },
             {
-                label:"數量",
-                key:"qty"
+                label:"現存倉庫",
+                key:"warehouse_desc2"
+                
             },
             {
-                label:"圖片",
-                key:"img"
-            }
+                label:"入倉單號",
+                key:"trans_code"
+                
+            }            
+            
 
         ],
-        search:"",
+        
         selected:[],
         sysSelecteds:[],
         importCount:0,
         parentTable:null,
-        searchData:{}
-
+        searchData:{},
+        searchLink:"",
+        search:{
+          searchText:"",
+          warehouseId:""
+        }
+        
+ 
     }
   },
   methods:{
@@ -95,11 +104,11 @@ export default {
       this.importCount=0
       this.selected.forEach(
         item=>{
-          const rowsIds = this.$parent.$refs.child.tableRows.map(rowItem => rowItem.item_id)
-          if(rowsIds.includes(item.item_id))
+          const rowsIds = this.$parent.$refs.child.tableRows.map(rowItem => rowItem.asset_id)
+          if(rowsIds.includes(item.asset_id))
           {
             for(let i in this.$parent.$refs.child.tableRows){
-              if(this.$parent.$refs.child.tableRows[i].item_id==item.item_id){
+              if(this.$parent.$refs.child.tableRows[i].asset_id==item.asset_id){
                 //this.$parent.$refs.child.tableRows[i].qty+=item.qty;
                 break
               }
@@ -108,7 +117,7 @@ export default {
           }
           else{
 
-             selItem={"item_id":item.item_id,"item_desc1":item.item_desc1,"item_desc2":item.item_desc2,"qty":0,"remark":"","create_by":""}
+             selItem={"asset_id":item.asset_id,"asset_code":item.asset_code,"item_desc1":item.item_desc1,"item_desc2":item.item_desc2,"warehouse_desc2":item.warehouse_desc2,"qty":1,"remark":"","create_by":""}
              this.$parent.$refs.child.tableRows.push(selItem)
              this.importCount=this.importCount+1
           }
@@ -124,6 +133,7 @@ export default {
       }
       else{
         this.$refs.child.showAlert(msg,"success")
+        this.$parent.isDisabled_wh_from=true
 
       }
       
@@ -136,6 +146,7 @@ export default {
       this.continueSaver=false
       this.$refs.child.dialogSize="lg"
       this.$refs.child.tableRows=[]
+      this.$refs.child.tableColumns=this.columns
       this.selected=[]
       this.$parent.$refs.child.tableRows.forEach(
            item=>{
@@ -143,36 +154,28 @@ export default {
       })
       this.$refs.child.tableConfig.totalRows=this.$refs.child.tableRows.length
       this.$refs.child.tableConfig.totalPage=Math.ceil(this.$refs.child.tableConfig.totalRows / this.$refs.child.tableConfig.perPage)
+      this.$refs.child.perPage=0//設置為不是自動分頁
       
       
     },
 
     badingData(){
             let self=this
-            self.searchData={
-                            "page":this.$refs.child.tableConfig.currentPage,
-                            "num_of_page":this.$refs.child.tableConfig.perPage,
-                            "search":this.search,
-                            "iso":-1,
+            this.searchLink=this.$parent.$parent.getAssetLink
+            this.searchData={
+                            "website_code" : "",
+                            "security_id" : "",               
+                            "page":self.$refs.child.tableConfig.currentPage,
+                            "num_of_page":self.$refs.child.tableConfig.perPage,
+                            "search":self.search.searchText,
+                            "warehouse_id":self.search.warehouseId,
+                            "void":0,
                             "order_by":"",
                             "order_desc":false
             }
-            this.$http.post(this.$parent.$parent.getItemLink,self.searchData)
-                        .then(function(response){
-                            let res=response.data
-                            self.$refs.child.tableRows = res.data
-                            self.$refs.child.tableColumns=self.columns
-                            self.isLoading=false
-                            self.$refs.child.tableConfig.totalRows=res.records
-                            self.$refs.child.tableConfig.totalPage=Math.ceil(res.records / self.$refs.child.tableConfig.perPage)
-                            this.showSelectRow()
+            this.$refs.child.badingData(this)
 
-                        })
-                        .catch(function(){
-                            //console.log(error)
-                            self.isLoading=false
-                        })
-        
+       
       },
 
      textSearch(){
@@ -184,7 +187,7 @@ export default {
 
       onRowClicked(item){
         for(let i in this.selected){
-          if(this.selected[i].item_id==item.item_id){
+          if(this.selected[i].asset_id==item.asset_id){
             this.selected.splice(i, 1)
             break
           }
@@ -197,8 +200,8 @@ export default {
           })         
         }else{
           items.forEach(item => {
-                const selectedIds = this.selected.map(selectedItem => selectedItem.item_id)
-                if (!selectedIds.includes(item.item_id) ) {
+                const selectedIds = this.selected.map(selectedItem => selectedItem.asset_id)
+                if (!selectedIds.includes(item.asset_id) ) {
                   this.selected.push(item)
                 }
           })
@@ -209,8 +212,8 @@ export default {
       },
       isSelected(citem){
         let re=false;
-        const selectedIds = this.selected.map(selectedItem => selectedItem.item_id)
-        if(selectedIds.includes(citem.item_id))
+        const selectedIds = this.selected.map(selectedItem => selectedItem.asset_id)
+        if(selectedIds.includes(citem.asset_id))
         {
           re=true
         }
@@ -232,7 +235,7 @@ export default {
       clearSelectCurrentPage(){
         this.$refs.child.tableRows.forEach(item => {
             for(let i in this.selected){
-               if (this.selected[i].item_id==item.item_id ) {
+               if (this.selected[i].asset_id==item.asset_id ) {
                     this.selected.splice(i, 1);
                     break;
                     
@@ -246,7 +249,7 @@ export default {
       showSelectRow(){
       for (let index = 0; index < this.$refs.child.tableRows.length; index++) {
          this.selected.forEach(selectItme=>{
-           if(selectItme.item_id==this.$refs.child.tableRows[index].item_id){
+           if(selectItme.asset_id==this.$refs.child.tableRows[index].asset_id){
              this.$refs.child.selectTable.selectRow(index)
            }
          })      

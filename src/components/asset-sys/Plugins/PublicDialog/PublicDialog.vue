@@ -1,7 +1,7 @@
 <template>
 <div >
   
-  <b-modal :id="myModalDialog" content-class="shadow" :title="modal_titel" @show="beforeOpen" @hide="cardCloseDo" 
+  <b-modal :id="myModalDialog"  @show="beforeOpen" @hide="cardCloseDo" 
                             @close="closeDialog" 
                             :cancel-disabled="cancelDisabled"
                             :cancel-title="cancelText"
@@ -20,11 +20,19 @@
      >
       {{alert_text}} {{ dismissCountDown }} seconds...
      </b-alert>
-     <div style="text-align:left">
+
+    <template v-slot:modal-title class="font">
+      <div class="font title">
+          {{modal_titel}}
+      </div>
+      
+    </template>
+
+     <div style="text-align:left" class="font">
         <slot name="body" ></slot>
      </div>
 
-     <div slot="modal-footer" class="w-100" >
+     <div slot="modal-footer" class="w-100 font" >
         <b-button
           variant="danger"
           size="md"
@@ -66,11 +74,11 @@ export default {
   methods:{
     //打開對話框前
   beforeOpen (e) {    
-       this.isAoutoClose=false;//設置為手動關閉標識（false:手動關閉）
-       this.cancelDisabled=false;//禁用Cancel制標識
-       this.isHideCloseButten=false;//顯示關閉制標識
-       this.dismissCountDown=0;
-       this.$parent.beforeOpen(e);//調用父窗體的方法，用來處理不同窗體特有的處理
+       this.isAoutoClose=false//設置為手動關閉標識（false:手動關閉）
+       this.cancelDisabled=false//禁用Cancel制標識
+       this.isHideCloseButten=false//顯示關閉制標識
+       this.dismissCountDown=0
+       this.$parent.beforeOpen(e)//調用父窗體的方法，用來處理不同窗體特有的處理
 
     },
      //關閉對話框前時的處理
@@ -78,7 +86,7 @@ export default {
 
          if(!this.isAoutoClose)//如果不是手動關閉即不會關閉對話框（即防止點擊背景時自動關閉）
          {
-             bvModalEvt.preventDefault();
+             bvModalEvt.preventDefault()
              return;
          }
 
@@ -92,10 +100,10 @@ export default {
 
     openConterl(thisParent){
 
-        this.cancelDisabled=false;
-        this.isHideCloseButten=false;
-        thisParent.$parent.isLoading=false;//關閉加載頁面
-        thisParent.isSaveDisabled=false;//啟用保存制
+        this.cancelDisabled=false
+        this.isHideCloseButten=false
+        thisParent.$parent.isLoading=false//關閉加載頁面
+        thisParent.isSaveDisabled=false//啟用保存制
         thisParent.saveText="保存"//保存制保存的字樣
                           
      },
@@ -103,51 +111,52 @@ export default {
     closeControl(thisParent){
          this.isHideCloseButten=true
          this.cancelDisabled=true
-         thisParent.$parent.isLoading=true;//啟動加載頁面
-         thisParent.saveText="Saveing...";//保存制正在保存中的字樣
-         thisParent.isSaveDisabled=true;//禁用保存制
+         thisParent.$parent.isLoading=true//啟動加載頁面
+         thisParent.saveText="Saveing..."//保存制正在保存中的字樣
+         thisParent.isSaveDisabled=true//禁用保存制
 
      },
     countDownChanged(dismissCountDown) {
         this.dismissCountDown = dismissCountDown
       },
     showAlert(showText,showVariant) {
-        this.dismissCountDown = this.dismissSecs;
+        this.dismissCountDown = this.dismissSecs
         this.alert_text=showText;
         this.alert_variant=showVariant;
       },
 
-    saveData(controlDialog,saveLink,saveDate){
-          let self=this;
+    saveData(controlDialog,saveLink,saveDate,headers){
+          let self=this
           this.closeControl(controlDialog);//調用公用窗體的confirmData方法，用禁用相關的按鈕。
-          console.log(saveLink);
           self.axios(
                 {
                     method: "POST",
                     url: saveLink,
                     data: saveDate,
+                    headers: headers
+
                 }
             )
             .then(function(response){
                             if(response.data.code>0)
                             {
-                              self.showAlert(response.data.msg,"success");
+                              self.showAlert(response.data.msg,"success")
 
                             }
                             else{
-                              self.showAlert(response.data.msg,"danger");
+                              self.showAlert(response.data.msg,"danger")
 
                             }
 
                             self.openConterl(controlDialog);//調用公用窗體的closeConfirm方法，用啟用相關的按鈕。
-                            controlDialog.parentTable.textSearch();
+                            controlDialog.parentTable.textSearch()
 
             })
              .catch(function(error){
                             console.log(error);
-                            self.showAlert(error,"danger");
+                            self.showAlert(error,"danger")
                             self.openConterl(controlDialog);//調用公用窗體的closeConfirm方法，用啟用相關的按鈕。
-                            controlDialog.parentTable.textSearch();
+                            controlDialog.parentTable.textSearch()
              })
       },
       // saveData(controlDialog,saveLink,saveDate){         
@@ -180,3 +189,21 @@ export default {
   
 }
 </script>
+<style lang="css" scoped>
+    /* For modal */
+    @import url(
+        "https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap&subset=chinese-traditional"
+    );
+
+    .font {
+        font-family: "Noto Sans TC", sans-serif;
+    }
+
+    .label {
+        font-size: 20px;
+    }
+
+    .title {
+        font-size: 30px;
+    }
+</style>

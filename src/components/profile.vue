@@ -40,10 +40,8 @@
         },
         mounted() {
             let self = this
-
             if(self.$cookies.isKey("security_id")) {
                 self.securityID = self.$cookies.get("security_id")
-
                 self.axios(
                     {
                         method: "POST",
@@ -60,14 +58,15 @@
                     if(code > 0) {
                         // 成功讀取帳號資訊
                         let data = response.data.data
-
                         self.name = data["name"]
+
                     }
                     else {
                         if(code == -1111003 || code == -1111004) {
                             // 刪除 cookies
                             self.$cookies.remove("security_id")
                             // 轉至首頁
+                            
                             self.$router.replace(self.component.index)
                         }
                         else {
@@ -91,6 +90,7 @@
             }
             else {
                 // 轉至「登入」頁面
+                console.log("2")
                 self.$router.replace(self.component.login)
                 return
             }

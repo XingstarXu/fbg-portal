@@ -1,8 +1,6 @@
 <template>
    <div>
-
-
-
+       <ItemViewDialog ref="itDialog"/>
         <publicTable ref="child" >
             <template v-slot:searchAdd>
                 <b-container fluid >
@@ -34,7 +32,8 @@
             </template>
 
             <template v-slot:diyColumn="myItem">
-                  <b-button @click="showEditDialog(myItem.data.item,myItem.data.index)" variant="info"><font-awesome-icon  icon="edit" /></b-button>
+                  <b-button @click="showEditDialog(myItem.data.item,myItem.data.index)" variant="primary"><font-awesome-icon  icon="edit" /></b-button> | 
+                  <b-button @click="showAssetDialog(myItem.data.item)" variant="info">項目明細</b-button>
             </template>
 
             
@@ -48,6 +47,7 @@
    </div>
 </template>
 <script>
+import ItemViewDialog from "../../components/Item/Item_View"
 export default {
     name:'StoreHouse',
     data(){
@@ -85,23 +85,23 @@ export default {
     methods:{
        showEditDialog(editRow,index){
            this.$refs.child.selectRow(index)
-           this.$parent.$refs.shDialog.setData(editRow);
-           this.$parent.$refs.shDialog.operation="update";
-           this.$bvModal.show('ModalDialog');
+           this.$parent.$refs.shDialog.setData(editRow)
+           this.$parent.$refs.shDialog.operation="update"
+           this.$bvModal.show('ModalDialog')
 
            
 
        },
        showNewDialog(){
            this.$parent.$refs.shDialog.operation="add"
-           this.$bvModal.show('ModalDialog');
+           this.$bvModal.show('ModalDialog')
 
 
 
        },
        showDelete(deleteRow){
-           this.$parent.$refs.shDelete.deleteData=deleteRow;    
-           this.$bvModal.show('ModalDelete');
+           this.$parent.$refs.shDelete.deleteData=deleteRow
+           this.$bvModal.show('ModalDelete')
 
 
 
@@ -132,24 +132,26 @@ export default {
                 return 'table-danger'
             } 
         },
+
+        showAssetDialog(item){
+            
+            this.$refs.itDialog.search.warehouseId=item.warehouse_id
+            this.$refs.itDialog.modalTitel=item.warehouse_desc2+" 倉庫明細"   
+            this.$bvModal.show('ItemViewDialog')        
+            this.$refs.itDialog.badingData()
+        },
+
      
     },
     components:{
-
+        ItemViewDialog
     },
     mounted:function(){
-        this.$refs.child.columns=this.columns;
+        this.$refs.child.columns=this.columns
         this.$refs.child.config.title="倉庫管理"
-        this.textSearch();
-
-        
+        this.$refs.itDialog.setModalDialogName("ItemViewDialog")
+        this.textSearch()
     },
     
 }
 </script>
-<style lang="scss">
-
-#columnDispay{
-  display: none
-}
-</style>
