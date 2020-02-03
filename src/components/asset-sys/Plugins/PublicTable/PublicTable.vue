@@ -130,7 +130,17 @@ export default {
                 this.$refs.publicTable.selectRow(index)
             },
             badingData(publicTable){
+                    //獲取安全Cookies
                     let self=this
+                    let securityID=""
+                    if(self.$cookies.isKey("security_id")) {
+                        securityID = self.$cookies.get("security_id")
+                    }
+                    else {
+                        // 轉至「登入」頁面
+                        self.$router.replace("/login")
+                        return
+                    }                    
                     let searchLink=publicTable.searchLink
                     let searchData=publicTable.searchData
                     publicTable.$parent.isLoading=true
@@ -140,6 +150,10 @@ export default {
                         searchData.page=self.config.currentPage
                     }
                     this.isPageChange=false
+                    searchData.security_id=securityID
+                    searchData.website_code="WEB01"
+                    searchData.page=self.config.currentPage
+                    searchData.num_of_page=self.config.perPage
                     this.$http.post(searchLink,searchData)
                                 .then(function(response){
                                     let res=response.data
@@ -147,11 +161,23 @@ export default {
                                     publicTable.$parent.isLoading=false
                                     self.config.totalPage=res.total_page
                                     self.config.totalRows=res.records
+                                    if(response.data.code<0){
+                                        self.$cookies.remove("security_id")
+                                        self.$router.replace("/")
+                                        
+                                    }
+                                    
+                                    
 
                                 })
-                                .catch(function(){
-                                    //console.log(error);
+                                .catch(function(error){
+                                    console.log(error)
                                     publicTable.$parent.isLoading=false
+                                    if(error.data.code<0){
+                                        self.$cookies.remove("security_id")
+                                        self.$router.replace("/")
+                                        
+                                    }
                                 })
 
 

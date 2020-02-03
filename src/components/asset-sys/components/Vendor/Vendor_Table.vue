@@ -121,8 +121,10 @@ export default {
 
             this.searchLink=this.$parent.searchLink
             this.searchData={
-                        "page":this.$refs.child.config.currentPage,
-                        "num_of_page":this.$refs.child.config.perPage,
+                        "website_code": "",
+                        "security_id" : "",                
+                        "page":"",
+                        "num_of_page":"",
                         "search":this.searchText,
                         "disable":this.isDisable,
                         "order_by":"",

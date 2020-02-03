@@ -69,7 +69,7 @@
                   <b-row class="mb-3" >
                       <b-col>
                           <template v-if="!isDisabled">
-                              <b-button variant="success" align="right" @click="showNewDialog" :disabled="isDisabled">
+                              <b-button variant="success" align="right" @click="showNewDialog" :disabled="isDisabled || isEditRow">
                                   <i class="far fa-plus-square"></i> 
                                   新增報銷資產
                               </b-button> 
@@ -122,7 +122,7 @@
           </template> -->
 
           <template v-slot:okbutten >
-              <template v-if="isSaveDisabled==false">
+              <template v-if="isSaveDisabled==false && isEditRow==false">
                  <b-button 
                            variant="primary"
                            size="md"
@@ -224,7 +224,8 @@ export default {
         parentTable:null,
         delMsg:"",
         deleteItem:{},
-        isDisabled_wh_id:false
+        isDisabled_wh_id:false,
+        isEditRow:false
     }
   },
   methods:{
@@ -278,8 +279,6 @@ export default {
                     void:editRow.void             
           };
           this.$refs.child.tableRows=[]
-          console.log(detailes)
-          console.log(this.$refs.child.perPage)
           detailes.forEach(dItem=>{
                                   this.details_update={
                                         discard_header_id:dItem.discard_header_id,
@@ -310,20 +309,9 @@ export default {
         //Details表取值
         this.detailsRows=this.$refs.child.tableRows
 
-        //獲取安全Cookies
-        let securityID=""
-        if(self.$cookies.isKey("security_id")) {
-            securityID = self.$cookies.get("security_id")
-        }
-        else {
-            // 轉至「登入」頁面
-            self.$router.replace("/login")
-            return
-        }
-
         let saveData={
-                        "website_code": "WEB01",
-                        "security_id": securityID,         
+                        "website_code": "",
+                        "security_id": "",         
                         "header":self.header_new,
                         "details":self.detailsRows
 
@@ -337,8 +325,15 @@ export default {
       },
     
       getWareHouse(){
-        let self=this;
-        this.$http.post(this.$parent.getWareHouseLink,{"disable":0}
+        let self=this
+        let securityID=this.$refs.child.getSecurityID()
+        let websiteCode=this.$refs.child.getWebsiteCode()
+        let searchData={
+        website_code : websiteCode,
+        security_id : securityID,
+        "disable":0
+        }       
+        this.$http.post(this.$parent.getWareHouseLink,searchData
                       )
                       .then(
                         function(response){
@@ -406,6 +401,7 @@ export default {
           this.isDisabled_wh_id=false
           this.parentTable=this.$parent.$refs.dsTable
           this.$refs.child.perPage=5//設置為是自動分頁
+          this.isEditRow=false
           let newDate=new Date()
           switch (this.operation) {
           case "add": //如果是新增時初始化變量
@@ -438,7 +434,7 @@ export default {
           }
           this.$refs.child.tableConfig.totalRows=this.$refs.child.tableRows.length
           this.$refs.child.tableConfig.totalPage=Math.ceil(this.$refs.child.tableConfig.totalRows / this.$refs.child.tableConfig.perPage)         
-              this.badingData()
+          this.badingData()
           this.getWareHouse()
     
         
@@ -462,12 +458,14 @@ export default {
           else{
             this.$refs.child.selectRow(item.data.index)
           }
+          this.isEditRow=true
         
       },    
       editRowOK(item){
           this.editItem.editIndex=-1
           this.$refs.child.unselectRow(item.data.index)
           this.$refs.child.selectRow(item.data.index)
+          this.isEditRow=false
       },
       editRowCancel(item){
           this.editItem.editIndex=-1
@@ -477,6 +475,7 @@ export default {
           this.editItem.remarkValue="";
           this.$refs.child.unselectRow(item.data.index)
           this.$refs.child.selectRow(item.data.index)
+          this.isEditRow=false
         
 
       },

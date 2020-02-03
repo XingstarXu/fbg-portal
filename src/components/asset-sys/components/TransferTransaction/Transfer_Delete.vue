@@ -62,21 +62,11 @@ export default {
             if(this.$v.$invalid){
                return
             }
-            //獲取安全Cookies
-            let securityID=""
-            if(this.$cookies.isKey("security_id")) {
-                securityID = this.$cookies.get("security_id")
-            }
-            else {
-                // 轉至「登入」頁面
-                self.$router.replace("/login")
-                return
-            }  
                       
             this.parentTable=this.$parent.$refs.ttTable
             this.saveData={
-                          website_code: "WEB01",
-                          security_id: securityID,             
+                          website_code: "",
+                          security_id: "",             
                           transfer_header_id :this.deleteData._id,
                           void_reason: this.deleteData.void_reason
                           }            

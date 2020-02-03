@@ -95,11 +95,16 @@ export default {
         }
         else{
             
-            this.addData={  "type_desc1":this.editData.type_desc1, 
+            this.addData={  
+                            "website_code": "",
+                            "security_id": "",   
+                            "type_desc1":this.editData.type_desc1, 
                             "type_desc2":this.editData.type_desc2, 
                             "create_by":"jx.xu"   
                          }
             this.updateData={
+                            "website_code": "",
+                            "security_id": "",                
                             "type_id":this.editData.type_id, 
                             "type_desc1":this.editData.type_desc1, 
                             "type_desc2":this.editData.type_desc2,  

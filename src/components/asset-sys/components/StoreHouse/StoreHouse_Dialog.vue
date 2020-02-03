@@ -2,7 +2,7 @@
 <div>
   <publicDialog ref="child" >           
           <template v-slot:body>
-            <b-form-group
+            <!-- <b-form-group
               label-cols-sm="4"
               label="倉庫編號:"
               label-align-sm="right"
@@ -20,7 +20,7 @@
                  </div>
                  
 
-             </b-form-group>
+             </b-form-group> -->
              <b-form-group
               label-cols-sm="4"
               label="倉庫名稱(英):"
@@ -95,7 +95,7 @@
 </div>
 </template>
 <script>
-import { required, minLength } from 'vuelidate/lib/validators'
+import { required } from 'vuelidate/lib/validators'
 export default {
   name:"shDialog",
   data(){
@@ -145,18 +145,19 @@ export default {
               this.continueSaver=false
             }
             
-            this.addData={  "warehouse_code":this.editData.warehouse_code, 
+            this.addData={
+                            "website_code": "",
+                            "security_id": "",              
                             "warehouse_desc1":this.editData.warehouse_desc1, 
                             "warehouse_desc2":this.editData.warehouse_desc2, 
-                            "create_by":"jx.xu"
                          }
             this.updateData={
+                            "website_code": "",
+                            "security_id": "",              
                             "warehouse_id": this.editData.warehouse_id,
-                            "warehouse_code":this.editData.warehouse_code, 
                             "warehouse_desc1":this.editData.warehouse_desc1, 
                             "warehouse_desc2":this.editData.warehouse_desc2, 
-                            "disable":this.editData.disable,
-                            "update_by":"jx.xu"        
+                            "disable":this.editData.disable,      
                             }               
             switch(this.operation)
             {
@@ -230,36 +231,36 @@ export default {
   },
   validations: {
     editData: {
-      warehouse_code:{
-          required,
-          minLength: minLength(1),
-          maxLength: minLength(3),
-          async isUnique (value) {//驗證是否唯一
-            let se=this
-            let isCodeUnique=false
-            if (value === '') return true
-            try {
-              let res = await se.getCodeUnique(value)
+      // warehouse_code:{
+      //     required,
+      //     minLength: minLength(1),
+      //     maxLength: minLength(3),
+      //     async isUnique (value) {//驗證是否唯一
+      //       let se=this
+      //       let isCodeUnique=false
+      //       if (value === '') return true
+      //       try {
+      //         let res = await se.getCodeUnique(value)
 
-              // 等拿到返回数据res后再进行处理
-              if(res.data.res==0 | se.operation=="update")
-              {
-                isCodeUnique=true  
-              }
-              else
-              {
-                isCodeUnique=false 
-              }
+      //         // 等拿到返回数据res后再进行处理
+      //         if(res.data.res==0 | se.operation=="update")
+      //         {
+      //           isCodeUnique=true  
+      //         }
+      //         else
+      //         {
+      //           isCodeUnique=false 
+      //         }
              
-           } catch (err) {
-             //console.log(err)
-             isCodeUnique=true
+      //      } catch (err) {
+      //        //console.log(err)
+      //        isCodeUnique=true
            
-           } 
-            return Boolean(isCodeUnique)
+      //      } 
+      //       return Boolean(isCodeUnique)
 
-          }
-         },
+      //     }
+      //    },
       warehouse_desc1:{
         required
       },

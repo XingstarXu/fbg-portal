@@ -84,41 +84,23 @@ export default {
 
         },        
        badingData(){
-            let self=this; 
-            self.isLoading=true;  
-            let myCurrentPage=self.$refs.child.config.currentPage;
-            let myPerPage=self.$refs.child.config.perPage;
-            let mySearch=self.$refs.child.config.search;
-            let myDisable=self.isDisable;
-
-            this.$http.post(this.$parent.searchLink,{"page":myCurrentPage,"num_of_page":myPerPage,"search":mySearch,"disable":myDisable,"order_by":"","order_desc":false})
-                        .then(function(response){
-                            let res=response.data;
-                            self.$refs.child.rows = res.data
-                            self.isLoading=false;
-                            self.$refs.child.config.totalPage=res.total_page;  
-                            self.$refs.child.config.totalRows=res.records;
-
-                        })
-                        .catch(function(){
-                            //console.log(error);
-                            self.isLoading=false;
-                        })
-
-
-
-       },
-     textSearch(){
             this.searchLink=this.$parent.searchLink
             this.searchData={
-                        "page":this.$refs.child.config.currentPage,
-                        "num_of_page":this.$refs.child.config.perPage,
+                        "website_code":"",
+                        "security_id":"",                    
+                        "page":"",
+                        "num_of_page":"",
                         "search":this.searchText,
                         "disable":this.isDisable,
                         "order_by":"",
                         "order_desc":false
             }
-            this.$refs.child.badingData(this);//調用公用表的綁定方法
+            this.$refs.child.badingData(this)//調用公用表的綁定方法
+
+
+       },
+     textSearch(){
+            this.badingData()
      },
      //停用或取消記錄時的行樣式
      rowClass(item) {

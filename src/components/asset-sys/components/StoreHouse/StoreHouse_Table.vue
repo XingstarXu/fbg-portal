@@ -111,18 +111,23 @@ export default {
                 this.searchText=value;
 
         }, 
-
-        textSearch(){
+        badingData(){
             this.searchLink=this.$parent.searchLink
             this.searchData={
-                        "page":this.$refs.child.config.currentPage,
-                        "num_of_page":this.$refs.child.config.perPage,
+                        "website_code":"",
+                        "security_id":"",                    
+                        "page":"",
+                        "num_of_page":"",
                         "search":this.searchText,
                         "disable":this.isDisable,
                         "order_by":"",
                         "order_desc":false
             }
-            this.$refs.child.badingData(this);//調用公用表的綁定方法
+            this.$refs.child.badingData(this)//調用公用表的綁定方法
+
+        },
+        textSearch(){
+            this.badingData()
         },
         //停用或取消記錄時的行樣式
         rowClass(item) {

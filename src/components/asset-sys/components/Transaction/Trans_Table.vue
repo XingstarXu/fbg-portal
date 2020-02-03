@@ -135,23 +135,12 @@ export default {
 
       textSearch(){
 
-            //獲取安全Cookies
-            let securityID=""
-            if(self.$cookies.isKey("security_id")) {
-                securityID = self.$cookies.get("security_id")
-            }
-            else {
-                // 轉至「登入」頁面
-                self.$router.replace("/login")
-                return
-            }
-
             this.searchLink=this.$parent.searchLink
             this.searchData={
-                    "website_code": "WEB01",
-                    "security_id" : securityID,
-                    "page":this.$refs.child.config.currentPage,
-                    "num_of_page":this.$refs.child.config.perPage,
+                    "website_code": "",
+                    "security_id" : "",
+                    "page":"",
+                    "num_of_page":"",
                     "search":this.searchText,
                     "order_by":"",
                     "order_desc":false,

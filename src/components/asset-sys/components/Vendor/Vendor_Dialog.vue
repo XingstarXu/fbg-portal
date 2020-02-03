@@ -193,7 +193,10 @@ export default {
               this.continueSaver=false
             }
             
-            this.addData={  "vendor_desc1":this.editData.vendor_desc1, 
+            this.addData={  
+                            "website_code": "",
+                            "security_id": "",              
+                            "vendor_desc1":this.editData.vendor_desc1, 
                             "vendor_desc2":this.editData.vendor_desc2,
                             "address":this.editData.address,
                             "phone":this.editData.phone,
@@ -201,6 +204,8 @@ export default {
                             "create_by":"jx.xu"  
                          }
             this.updateData={
+                            "website_code": "",
+                            "security_id": "",              
                             "vendor_id": this.editData.vendor_id, 
                             "vendor_desc1":this.editData.vendor_desc1, 
                             "vendor_desc2":this.editData.vendor_desc2,

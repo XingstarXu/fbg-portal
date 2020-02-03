@@ -61,15 +61,15 @@
                     </b-col>  
                     <b-col lg="3">
                             <template v-if="isDisabled">
-                                {{editData.invoice_no}}
+                                {{editData.pr_no}}
 
                             </template>
                             <template v-else>
-                                  <b-form-input v-model="editData.invoice_no" 
-                                            :class="{ 'is-invalid': $v.editData.invoice_no.$error,'is-valid':!$v.editData.invoice_no.$invalid }"
+                                  <b-form-input v-model="editData.pr_no" 
+                                            :class="{ 'is-invalid': $v.editData.pr_no.$error,'is-valid':!$v.editData.pr_no.$invalid }"
                                             :disabled="isDisabled"
                                   ></b-form-input>   
-                                  <div v-if="$v.editData.invoice_no.$error" class="invalid-feedback d-block">
+                                  <div v-if="$v.editData.pr_no.$error" class="invalid-feedback d-block">
                                       <span>發票號是必要的</span>
                                   </div>                                  
                             </template>                       
@@ -77,23 +77,29 @@
 
                     </b-col> 
                     <b-col lg="2" style="text-align:right" >
-                             <!--入倉日期:-->
+                             上傳發票:
 
                     </b-col> 
                     <b-col lg="3">
 
-                            <!--<template v-if="isDisabled">
-                                {{editData.trans_date}}
+                          <template v-if="isDisabled">
+                              <div v-if="isPDF(editData.invoice_doc)">
+                                 <b-link @click="openFile">查看發票</b-link>
+                              </div>
+                              <div v-else>
+                                   無發票文件
+                              </div>
+                                 
 
                             </template>
                             <template v-else>
                                                 
                   
-                                  <b-form-input type="date" v-model.trim="$v.editData.trans_date.$model" placeholder="Enter date"></b-form-input> 
-                                    <div v-if="$v.editData.trans_date.$error" class="invalid-feedback d-block">
-                                      <span>入倉時期是必要的</span>
+                                  <uploadFile ref="doc"/>
+                                    <div v-if="$v.editData.invoice_doc.$error" class="invalid-feedback d-block">
+                                      <span>上傳發票是必要的</span>
                                   </div>                                    
-                           </template>    -->                     
+                           </template>                   
                                       
                     </b-col>   
                   </b-row>
@@ -186,7 +192,7 @@
             </template>      
           </template>   
           <template v-slot:okbutten >
-              <template v-if="isSaveDisabled==false">
+              <template v-if="isSaveDisabled==false && isEditRow==false">
                  <b-button 
                            variant="primary"
                            size="md"
@@ -230,7 +236,7 @@
 </div>
 </template>
 <script>
-
+import uploadFile from "./update-file"
 import transItemDialog from "../../components/Transaction/Trans_Item_Dialog"
 import assetDialog from "../../components/Asset/Asset_Dialog"
 import { ModelListSelect } from 'vue-search-select'
@@ -299,13 +305,14 @@ export default {
                         vendor_desc2: editRow.vendor_desc2,
                         warehouse_id:editRow.warehouse_id,
                         warehouse_desc2: editRow.warehouse_desc2,
-                        invoice_no:editRow.invoice_no,
+                        pr_no:editRow.pr_no,
                         remark:editRow.remark,
                         total_amt: editRow.total_amt,
                         qty:editRow.qty,
                         void:editRow.void,
                         update_by:editRow.update_by,
-                        create_by:editRow.create_by
+                        create_by:editRow.create_by,
+                        invoice_doc:editRow.invoice_doc
                         };
           this.$refs.child.tableRows=[]
           detailes.forEach(
@@ -331,14 +338,22 @@ export default {
     },
     //保存數據
     saveData(){
+
+      //如果是新增時，要將上傳發票的文件值給保存變量中，以便進行驗證及保存。
+      if(this.operation=="add"){
+          this.editData.invoice_doc=this.$refs.doc.file
+      }
+
+
       this.$v.$touch()//驗證數據
       //判斷是否有效的數據，如果存在無效的數據即會作出相應的提示及不會進行保存
       if(this.$v.$invalid){
-            return;
+            return
       }
       else{
-        let detailesInvalid=false;//明細資料的驗證標識
-        let invalidText="";//出錯的提示內容
+        let detailesInvalid=false//明細資料的驗證標識
+        let invalidText=""//出錯的提示內容
+
         if(this.$refs.child.tableRows.length<=0){
             invalidText="沒有任何資產入庫，請加入資產項目！"
             this.$refs.child.showAlert(invalidText,"danger")
@@ -348,7 +363,7 @@ export default {
         this.$refs.child.tableRows.forEach(trItem=>{
              if(trItem.qty<=0){
                 invalidText="資料未完整，請在紅色提示處錄入完整數據!"
-                detailesInvalid=true;
+                detailesInvalid=true
               }
           })
         if(detailesInvalid){
@@ -366,45 +381,40 @@ export default {
     },
     //保存新增數據
     addData(){
-        let self=this
+        //let self=this
         //Header表取值
         let header_new={
                           vendor_id:this.editData.vendor_id,
                           warehouse_id: this.editData.warehouse_id,                        
-                          invoice_no:this.editData.invoice_no,
+                          pr_no:this.editData.pr_no,
                           qty:this.editData.qty,
                           total_amt:this.editData.total_amt,
                           remark:this.editData.remark
+
               };
         //Details表取值
         let detailsRows=this.$refs.child.tableRows
-
-        //獲取安全Cookies
-        let securityID=""
-        if(self.$cookies.isKey("security_id")) {
-            securityID = self.$cookies.get("security_id")
-        }
-        else {
-            // 轉至「登入」頁面
-            self.$router.replace("/login")
-            return
-        }
-
         //保存連接的參數
-        let saveData={
-                        "website_code": "WEB01",
-                        "security_id": securityID,
-                        "header": header_new,
-                        "details": detailsRows
-
-        }
-        this.$refs.child.saveData(this,this.$parent.addLink,saveData)
+        let formData = new FormData() 
+        formData.append("website_code", "")
+        formData.append("security_id", "")
+        formData.append("header",JSON.stringify(header_new))
+        formData.append("details",JSON.stringify(detailsRows))
+        formData.append("invoice_doc", this.editData.invoice_doc)//上傳文檔，需要獨立的參數進行傳遞。
+        this.$refs.child.saveData(this,this.$parent.addLink,formData)
 
     },
     //獲取倉庫資訊
     getWareHouse(){
     let self=this
-    this.$http.post(this.$parent.getWareHouseLink,{"disable":0}
+    let securityID=this.$refs.child.getSecurityID()
+    let websiteCode=this.$refs.child.getWebsiteCode()
+    let searchData={
+    website_code : websiteCode,
+    security_id : securityID,
+    "disable":0
+    }
+    this.$http.post(this.$parent.getWareHouseLink,searchData
                   )
                   .then(
                     function(response){
@@ -421,7 +431,14 @@ export default {
     //獲取供應商資訊
     getVendor(){
     let self=this
-    this.$http.post(this.$parent.getVendorLink,{"disable":0}
+    let securityID=this.$refs.child.getSecurityID()
+    let websiteCode=this.$refs.child.getWebsiteCode()
+    let searchData={
+    website_code : websiteCode,
+    security_id : securityID,
+    "disable":0
+    }
+    this.$http.post(this.$parent.getVendorLink,searchData
                   )
                   .then(
                     function(response){
@@ -488,134 +505,175 @@ export default {
     showNewDialog(){
         this.$bvModal.show('TransItemDialog')
     }, 
+    isPDF(invoice_doc){
+        return invoice_doc.indexOf(".pdf") >= 0
+
+    },
 
 //公共插件提供的公用方法>>>>>>
-   beforeOpen(){
-        this.$v.$reset()
-        this.$refs.child.dialogSize="xl"
-        this.$refs.child.tableColumns=this.columns
-        this.parentTable=this.$parent.$refs.trTable//設置父窗體 
-        this.$refs.child.perPage=5//設置為自動分頁（0:DB分頁 >0：自動分頁）
-        this.isEditRow=false//編輯行狀態標識
-        this.isSaveDisabled=false//保存時的狀設定
-        this.isDisabled=false //默認請況所有控件可以編輯
-        this.isSaveDisabled=false//保存制禁用標識  
-        switch (this.operation) {
-         case "add": //如果是新增時初始化變量
-            this.editData={
-              code:"",
-              trans_date:"",
-              vendor_id:"",
-              vendor_desc2: "",
-              warehouse_id:"",
-              warehouse_desc2: "",
-              invoice_no:"",
-              remark:"",
-              total_amt: 0,
-              qty:0,
-              void:0,
-              update_by:"",
-              create_by:""
-            }
-            this.editItem={
-              editIndex:-1,
-              remarkValue:"",
-              qtyValue:0,
-              priceValue:"",
-              amtValue:""              
-            }
-            
+    beforeOpen(){
+          this.$v.$reset()
+          this.$refs.child.dialogSize="xl"
+          this.$refs.child.tableColumns=this.columns
+          this.parentTable=this.$parent.$refs.trTable//設置父窗體 
+          this.$refs.child.perPage=5//設置為自動分頁（0:DB分頁 >0：自動分頁）
+          this.isEditRow=false//編輯行狀態標識
+          this.isSaveDisabled=false//保存時的狀設定
+          this.isDisabled=false //默認請況所有控件可以編輯
+          this.isSaveDisabled=false//保存制禁用標識 
+          switch (this.operation) {
+          case "add": //如果是新增時初始化變量
+              this.editData={
+                code:"",
+                trans_date:"",
+                vendor_id:"",
+                vendor_desc2: "",
+                warehouse_id:"",
+                warehouse_desc2: "",
+                pr_no:"",
+                invoice_doc:"newfile", 
+                remark:"",
+                total_amt: 0,
+                qty:0,
+                void:0,
+                update_by:"",
+                create_by:""
+              }
+              this.editItem={
+                editIndex:-1,
+                remarkValue:"",
+                qtyValue:0,
+                priceValue:"",
+                amtValue:""              
+              }
+              
 
-            this.$refs.child.tableRows=[]
-            this.$refs.child.tableConfig.totalRows=this.$refs.child.tableRows.length
-            this.$refs.child.tableConfig.totalPage=Math.ceil(this.$refs.child.tableConfig.totalRows / this.$refs.child.tableConfig.perPage) 
-                              
-            break
-          case "detalis": //如果是查詢詳細即禁止編輯
-            this.isDisabled=true
-            this.isSaveDisabled=true//保存制禁用標識            
-            break;
-        }
+              this.$refs.child.tableRows=[]
+              this.$refs.child.tableConfig.totalRows=this.$refs.child.tableRows.length
+              this.$refs.child.tableConfig.totalPage=Math.ceil(this.$refs.child.tableConfig.totalRows / this.$refs.child.tableConfig.perPage) 
+                                
+              break
+            case "detalis": //如果是查詢詳細即禁止編輯
+              this.isDisabled=true
+              this.isSaveDisabled=true//保存制禁用標識            
+              break;
+          }
 
-        this.badingData()
-        this.getWareHouse()
-        this.getVendor()
-    },
+          this.badingData()
+          this.getWareHouse()
+          this.getVendor()
+          //this.openFile()
+      },
 
-    editRow(item){
-        //保留原有的值    
-        this.editItem.editIndex=item.data.index
-        this.editItem.qtyValue=item.data.item.qty
-        this.editItem.remarkValue=item.data.item.remark
-        this.editItem.priceValue=item.data.item.price
-        this.editItem.amtValue=item.data.item.amt       
-        if(this.$refs.child.isRowSelected(item.data.index))
-        {
-            
+      editRow(item){
+          //保留原有的值    
+          this.editItem.editIndex=item.data.index
+          this.editItem.qtyValue=item.data.item.qty
+          this.editItem.remarkValue=item.data.item.remark
+          this.editItem.priceValue=item.data.item.price
+          this.editItem.amtValue=item.data.item.amt       
+          if(this.$refs.child.isRowSelected(item.data.index))
+          {
+              
+            this.$refs.child.unselectRow(item.data.index)
+          }
+          else{
+            this.$refs.child.selectRow(item.data.index)
+
+          }
+          this.isEditRow=true
+        
+      },
+
+      editRowOK(item){
+        //正整數正則表達式
+        let isInt=/^-?[0-9]\d*$/
+        //如果不是正整數時，則會提示用戶輸入正整數。
+        if(!isInt.test(item.data.item.qty)){
+          this.tooltip_show=!this.tooltip_show
+        }else{
+          this.editItem.editIndex=-1
           this.$refs.child.unselectRow(item.data.index)
-        }
-        else{
           this.$refs.child.selectRow(item.data.index)
-
+          this.isEditRow=false
         }
-        this.isEditRow=true
-      
-    },
 
-    editRowOK(item){
-      //正整數正則表達式
-      let isInt=/^-?[0-9]\d*$/
-      //如果不是正整數時，則會提示用戶輸入正整數。
-      if(!isInt.test(item.data.item.qty)){
-        this.tooltip_show=!this.tooltip_show
-      }else{
-        this.editItem.editIndex=-1
-        this.$refs.child.unselectRow(item.data.index)
-        this.$refs.child.selectRow(item.data.index)
-        this.isEditRow=false
+      },
+      editRowCancel(item){
+          this.editItem.editIndex=-1
+          //預先保存原有的值
+          item.data.item.qty=this.editItem.qtyValue
+          item.data.item.remark=this.editItem.remarkValue
+          item.data.item.price=this.editItem.priceValue
+          item.data.item.amt=this.editItem.amtValue
+
+          //清空臨時值
+          this.editItem.qtyValue=0
+          this.editItem.remarkValue=""
+          this.editItem.priceValue=0
+          this.editItem.amtValue=0
+
+          this.$refs.child.unselectRow(item.data.index)
+          this.$refs.child.selectRow(item.data.index)
+          this.isEditRow=false
+      },
+      rowClass(item){
+            if (!item) return
+            if (item.qty<=0){
+                return 'table-danger'
+            } 
+      },
+
+      badingData(){
+      },    
+      onRowClicked(){
+      },
+      onRowSelected(){
+      },
+      isSelected(){
+      },
+      openFile(){
+        let fileLink="http://192.168.12.26:9090/asset-sys/read-doc/"
+        let securityID=this.$refs.child.getSecurityID()  //"3257a4fd95e74538b8058bbe3e99958a"
+        let websiteCode=this.$refs.child.getWebsiteCode()//"WEB01"
+        console.log(this.editData.invoice_doc)
+        this.axios(
+            {
+              method: "POST",
+              url: fileLink,
+              data: {
+                website_code : websiteCode,
+                security_id : securityID,
+                invoice_doc : this.editData.invoice_doc,
+              },
+              // responseType: "Blob",
+              responseType: "arraybuffer",
+            }
+        )
+        .then(
+            function(response){
+              // 為 PDF 檔案建立一條 URL
+              const fileUrl = URL.createObjectURL(
+                new Blob([response.data], {type: "application/pdf"})
+              )
+              // 開啟一個新視窗，瀏覽 PDF
+              window.open(fileUrl)
+            }
+        )
+        .catch(
+            function(){
+              //console.log(error)
+            }
+        )
       }
-
-    },
-    editRowCancel(item){
-        this.editItem.editIndex=-1
-        //預先保存原有的值
-        item.data.item.qty=this.editItem.qtyValue
-        item.data.item.remark=this.editItem.remarkValue
-        item.data.item.price=this.editItem.priceValue
-        item.data.item.amt=this.editItem.amtValue
-
-        //清空臨時值
-        this.editItem.qtyValue=0
-        this.editItem.remarkValue=""
-        this.editItem.priceValue=0
-        this.editItem.amtValue=0
-
-        this.$refs.child.unselectRow(item.data.index)
-        this.$refs.child.selectRow(item.data.index)
-        this.isEditRow=false
-    },
-    rowClass(item){
-          if (!item) return
-          if (item.qty<=0){
-              return 'table-danger'
-          } 
-    },
-
-    badingData(){
-    },    
-    onRowClicked(){
-    },
-    onRowSelected(){
-    },
-    isSelected(){
-    }   
 //<<<<<公共插件提供的公用方法
 
   },
   components:{
     transItemDialog,
     ModelListSelect,
-    assetDialog
+    assetDialog,
+    uploadFile
 
   },
   mounted(){
@@ -635,10 +693,10 @@ export default {
       warehouse_id:{
         required
       },
-      // trans_date:{
-      //   required
-      // },
-      invoice_no:{
+      invoice_doc:{
+        required
+      },
+      pr_no:{
         required
 
       }
@@ -646,7 +704,6 @@ export default {
      
                       
     },
-
 
   }
   

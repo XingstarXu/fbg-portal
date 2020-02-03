@@ -31,7 +31,7 @@ export default {
             isLoading: false,
             fullPage: true,
             containerName:null,
-            addLink:"http://192.168.12.26:9090/asset-sys/cre-vdr/",
+            addLink:"http://192.168.12.26:9090/asset-sys/ins-vdr/",
             updateLink:"http://192.168.12.26:9090/asset-sys/upd-vdr/",
             searchLink:"http://192.168.12.26:9090/asset-sys/sel-vdr-for-table/",
             getAssetLink:"http://192.168.12.26:9090/asset-sys/sel-item-vendor-for-table/"

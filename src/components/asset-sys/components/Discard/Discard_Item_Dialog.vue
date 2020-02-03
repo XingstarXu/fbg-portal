@@ -71,8 +71,8 @@ export default {
                 sortable: true,
             },
             {
-                label:"數量",
-                key:"qty"
+                label:"類型",
+                key:"type_desc2"
             },
             {
                 label:"圖片",

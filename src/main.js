@@ -17,8 +17,10 @@ import 'vue-search-select/dist/VueSearchSelect.css'
 //導入插件
 import publicDialog from './components/asset-sys/Plugins/PublicDialog/index.js'
 import publicTable from './components/asset-sys/Plugins/PublicTable/index.js'
+import publicUpload from './components/asset-sys/Plugins/PublicUpload/index.js'
 Vue.use(publicDialog)
 Vue.use(publicTable)
+Vue.use(publicUpload)
 
 //導入驗證
 import vuelidate from 'vuelidate'

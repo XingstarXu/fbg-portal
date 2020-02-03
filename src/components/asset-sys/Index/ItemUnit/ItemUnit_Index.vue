@@ -27,7 +27,7 @@ export default {
             isLoading: false,
             fullPage: true,
             containerName:null,
-            addLink:"http://192.168.12.26:9090/asset-sys/cre-item-unit/",
+            addLink:"http://192.168.12.26:9090/asset-sys/ins-item-unit/",
             updateLink:"http://192.168.12.26:9090/asset-sys/upd-item-unit/",
             searchLink:"http://192.168.12.26:9090/asset-sys/sel-item-unit-for-table/",
             //checkCodeUnique:"http://192.168.12.26:9090/asset-sys/check-item-code/",

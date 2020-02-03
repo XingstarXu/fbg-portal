@@ -82,10 +82,6 @@ export default {
             {
                 label:"數量",
                 key:"qty"
-            },
-            {
-                label:"圖片",
-                key:"img"
             }
 
         ],
@@ -94,10 +90,13 @@ export default {
         importCount:0,
         parentTable:null,
         searchData:{},
+        searchLink:"",
         addLink:"http://192.168.12.26:9090/asset-sys/cre-item/",
         getTypeLink:"http://192.168.12.26:9090/asset-sys/sel-item-type/",
         getUnitLink:"http://192.168.12.26:9090/asset-sys/sel-item-unit/",
         getVendonLink:"http://192.168.12.26:9090/asset-sys/sel-vdr/"
+                        
+
 
     }
   },
@@ -146,30 +145,20 @@ export default {
     },
 
     badingData(){
-            let self=this
-            this.searchData={
-                            "page":this.$refs.child.tableConfig.currentPage,
-                            "num_of_page":this.$refs.child.tableConfig.perPage,
-                            "search":this.search,
-                            "iso":-1,
-                            "order_by":"",
-                            "order_desc":false
-            }
-            this.$http.post(this.$parent.$parent.getItemLink,this.searchData)
-                        .then(function(response){
-                            let res=response.data
-                            self.$refs.child.tableRows = res.data
-                            self.$refs.child.tableColumns=self.columns
-                            self.isLoading=false
-                            self.$refs.child.tableConfig.totalRows=res.records
-                            self.$refs.child.tableConfig.totalPage=Math.ceil(res.records / self.$refs.child.tableConfig.perPage)
-                            self.showSelectRow()//顯示被選中的行樣式
-
-                        })
-                        .catch(function(){
-                            //console.log(error)
-                            self.isLoading=false
-                        })
+              //獲取安全Cookies
+              this.searchLink=this.$parent.$parent.getItemLink
+              this.searchData={
+                          "website_code":"",
+                          "security_id":"",                    
+                          "page":1,
+                          "num_of_page":1,
+                          "search":this.search,
+                          "iso":-1,
+                          "order_by":"",
+                          "order_desc":false
+              }
+              this.$refs.child.tableColumns=this.columns
+              this.$refs.child.badingData(this);//調用公用表的綁定方法
         
       },
 
@@ -260,7 +249,6 @@ export default {
   },
   mounted(){
     this.$refs.child.modal_titel="入倉資產選擇"
-    this.$refs.child.tableColumns=this.columns
     this.$refs.itDialog.setModalDialogName("ItemDialog")
   },
   // validations: {

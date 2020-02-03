@@ -118,9 +118,10 @@
                   label-align-sm="right"
                   class="mb-0"
              >
-             <UpdateFile ref="uplodImage"/>
+             <UpdatePhoto ref="uplodImage"/>
              <!--如果有員工圖片時才會顯示image框-->
              <div v-if="editData.img!=''">
+               
                <b-img width="120" height="120" :src="getImage(editData.img)">
 
                </b-img>
@@ -149,7 +150,7 @@
 </div>
 </template>
 <script>
-import UpdateFile from './update-file'
+//import UpdatePhoto from './update-photo'
 import { required } from 'vuelidate/lib/validators'
 import { ModelListSelect } from 'vue-search-select'
 // import { saveAs } from 'file-saver'
@@ -191,6 +192,7 @@ export default {
   },
   methods:{
     saveData(){
+
         this.$v.$touch()
         if(this.$v.$invalid){
               
@@ -211,17 +213,6 @@ export default {
               this.continueSaver=false
             }
 
-            //獲取安全Cookies
-            let self=this
-            let securityID=""
-            if(self.$cookies.isKey("security_id")) {
-                securityID = self.$cookies.get("security_id")
-            }
-            else {
-                // 轉至「登入」頁面
-                self.$router.replace("/login")
-                return
-            }
             //獲鄧上傳的圖片
             this.editData.img=this.$refs.uplodImage.image
 
@@ -230,8 +221,6 @@ export default {
             switch(this.operation)
             {
               case "add":
-                formData.append("website_code", "WEB01")
-                formData.append("security_id", securityID)
                 formData.append("item_desc1", this.editData.item_desc1)
                 formData.append("item_desc2", this.editData.item_desc2)
                 formData.append("unit_id", this.editData.unit_id)
@@ -240,12 +229,8 @@ export default {
                 formData.append("img", this.editData.img)
                 formData.append("iso", this.editData.iso)
                 this.$refs.child.saveData(this,this.$parent.addLink,formData,{"Content-Type": "multipart/form-data"})
-                //self.savePhoto()
-
                 break;
               case "update":
-                formData.append("website_code", "WEB01")
-                formData.append("security_id", securityID)
                 formData.append("item_id", this.editData.item_id)
                 formData.append("item_desc1", this.editData.item_desc1)
                 formData.append("item_desc2", this.editData.item_desc2)
@@ -255,7 +240,6 @@ export default {
                 formData.append("img", this.editData.img)
                 formData.append("iso", this.editData.iso)
                 this.$refs.child.saveData(this,this.$parent.updateLink,formData,{"Content-Type": "multipart/form-data"})
-                //self.savePhoto()
                 break;
 
 
@@ -271,7 +255,7 @@ export default {
       this.$parent.isLoading=false
       this.editDisable_Disabled=false
       //this.parentTable=this.$parent.$refs.itTable 
-      
+     
       if(this.operation=="add")
       {
           this.editData={
@@ -299,7 +283,15 @@ export default {
      
     getType(){
       let self=this
-      this.$http.post(this.$parent.getTypeLink,{"disable":0}
+      let securityID=this.$refs.child.getSecurityID()
+      let websiteCode=this.$refs.child.getWebsiteCode()
+      let searchData={
+      website_code : websiteCode,
+      security_id : securityID,
+      "disable":0
+
+      }
+      this.$http.post(this.$parent.getTypeLink,searchData
                     )
                     .then(
                       function(response){
@@ -318,7 +310,15 @@ export default {
     },
     getUnit(){
       let self=this
-      this.$http.post(this.$parent.getUnitLink,{"disable":0}
+      let securityID=this.$refs.child.getSecurityID()
+      let websiteCode=this.$refs.child.getWebsiteCode()
+      let searchData={
+      website_code : websiteCode,
+      security_id : securityID,
+      "disable":0
+
+      }
+      this.$http.post(this.$parent.getUnitLink,searchData
                     )
                     .then(
                       function(response){
@@ -335,6 +335,7 @@ export default {
     },
 
     setData(editRow){
+                
                 this.editData={
                           item_id:editRow.item_id,
                           item_desc1:editRow.item_desc1,
@@ -406,10 +407,12 @@ export default {
   },
   components:{
     ModelListSelect,
-    UpdateFile
+    
+    //UpdatePhoto
   },
   mounted(){
     this.$refs.child.modal_titel="資產管理"
+    this.myImage=this.$Image
   },
   validations: {
     editData: {

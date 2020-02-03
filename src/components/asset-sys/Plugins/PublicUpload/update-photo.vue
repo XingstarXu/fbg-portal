@@ -16,11 +16,13 @@
                 </b-button>
             </b-input-group-append>
         </b-input-group>
-        <img
+        <b-img
             v-show="previewImage.show"
-            class="preview"
             :src="previewImage.image"
-        >
+            width="120" 
+            height="120"
+            thumbnail fluid
+        />
         <b-alert
             :show="inputImageMessage.show"
             :variant="inputImageMessage.type"
@@ -33,7 +35,7 @@
 
 <script>
     export default {
-        name: "UpdateFile",
+        name: "UpdatePhoto",
         data() {
             return {
                 image: null,
@@ -61,9 +63,9 @@
             },
             inputImage() {
                 let self = this
-
                 self.inputImageMessage.show = false
                 self.inputImageMessage.text = ""
+                this.$Image=null //初始化全局變量
 
                 if(self.image == null) {
                     return
@@ -94,6 +96,11 @@
                 // 顯示圖片
                 self.previewImage.image = URL.createObjectURL(self.image);
                 self.previewImage.show = true
+
+                //將圖片給全局屬性
+                this.$Image=self.image
+
+
             },
             upload() {
                 let self = this

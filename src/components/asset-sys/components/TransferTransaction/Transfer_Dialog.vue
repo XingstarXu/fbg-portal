@@ -132,7 +132,7 @@
           </template>
 
           <template v-slot:okbutten >
-              <template v-if="isSaveDisabled==false">
+              <template v-if="isSaveDisabled==false && isEditRow==false">
                  <b-button 
                            variant="primary"
                            size="md"
@@ -294,7 +294,6 @@ export default {
     },
     //保存新增數據
     addData(){
-        let self=this;
         //Header處理
         //Header表取值
         let header_new={
@@ -307,20 +306,9 @@ export default {
         //Details表取值
         let detailsRows=this.$refs.child.tableRows
 
-        //獲取安全Cookies
-        let securityID=""
-        if(self.$cookies.isKey("security_id")) {
-            securityID = self.$cookies.get("security_id")
-        }
-        else {
-            // 轉至「登入」頁面
-            self.$router.replace("/login")
-            return
-        }
-
           let saveData={
-                          "website_code": "WEB01",
-                          "security_id": securityID,            
+                          "website_code": "",
+                          "security_id": "",            
                           "header": header_new,
                           "details": detailsRows
 
@@ -335,8 +323,15 @@ export default {
       },
       //獲取倉庫信息
       getWareHouse(){
-        let self=this;
-        this.$http.post(this.$parent.getWareHouseLink,{"disable":0}
+        let self=this
+        let securityID=this.$refs.child.getSecurityID()
+        let websiteCode=this.$refs.child.getWebsiteCode()
+        let searchData={
+        website_code : websiteCode,
+        security_id : securityID,
+        "disable":0
+        }
+        this.$http.post(this.$parent.getWareHouseLink,searchData
                       )
                       .then(
                         function(response){

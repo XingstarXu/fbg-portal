@@ -110,11 +110,23 @@ export default {
      countDownChanged(dismissCountDown) {
         this.dismissCountDown = dismissCountDown
       },        
-    saveData(controlDialog,saveLink,saveDate){
+    saveData(controlDialog,saveLink,saveData){
           let self=this;
           this.closeControl(controlDialog);//調用公用窗體的confirmData方法，用禁用相關的按鈕。         
+          //獲取安全Cookies
+          let securityID=this.getSecurityID()
+          let websiteCode=this.getWebsiteCode()
+          if(Object.prototype.toString.call(saveData)=="[object FormData]")
+          {
+            saveData.append("website_code", websiteCode)//公共參數
+            saveData.append("security_id", securityID)//公共參數
+          }else{
+            saveData.website_code=websiteCode
+            saveData.security_id=securityID
+
+          }          
           this.$http.post(saveLink,
-                          saveDate)
+                          saveData)
                         .then(function(response){
                           console.log(response.data);
                             if(response.data.code>0)
@@ -138,6 +150,22 @@ export default {
                             controlDialog.parentTable.textSearch();
                         })
       },
+      getSecurityID(){
+          let securityID=""
+          if(self.$cookies.isKey("security_id")) {
+              securityID = self.$cookies.get("security_id")
+          }
+          else {
+              // 轉至「登入」頁面
+              self.$router.replace("/login")
+              
+          }
+          return securityID
+
+      },
+      getWebsiteCode(){
+        return "WEB01"
+      }     
 
   }
   
