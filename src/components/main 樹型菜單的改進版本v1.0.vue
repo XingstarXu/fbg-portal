@@ -8,8 +8,33 @@
                 -->
                 <b-col xl="2" class="p-0 d-none d-xl-block">
                       <b-nav id="nav-slider" >
-                            <tree-menu :label="tree.label"  :nodes="tree.nodes" :depth="tree.depth" :isRoot="tree.isRoot" :id="tree.id" :myClass="tree.myClass"></tree-menu>                     
+                            <tree-menu :label="tree.label"  :nodes="tree.nodes" :depth="0" :isRoot="true" ></tree-menu>                     
                       </b-nav>
+
+
+
+                    <!-- 首先 d-none 隠藏, 當螢幕處於 lg 大小時顯示 -->
+                    <!--<div id="nav-slider" class="d-none d-xl-block">
+                        <div id="title-table">
+                            <div id="title-cell">
+                                <div id="title">
+                                    Future Bright Group
+                                </div>
+                            </div>
+                        </div>
+                        <div id="line-ctn"><div id="line"></div></div>
+                        <b-nav vertical>
+                            <b-nav-item
+                                v-for="(item, index) in navItemList"
+                                :key="index"
+                                @click="changeTxtCol(item.tabID)"
+                                :ref="item.tabID"
+                                :link-classes="item.classValue"
+                                :to="item.url"> {{ item.tabName }}
+                            </b-nav-item>
+                        </b-nav>
+
+                    </div>-->
                 </b-col>
 
                 <b-col xl="10" lg="12" class="p-0">
@@ -73,95 +98,135 @@
     import LogoutAccount from "@/components/user-auth/app-logout-account"
     import ChangePwd from "@/components/user-auth/app-change-pwd"
     import TreeMenu from '@/test/TreeMenu.vue'
-    //父菜單數據
-    let tree = 
-    {
-        id:"1",
-        label:'主頁面',
-        isRoot:true,
-        depth:0,
-        to:"",
-        myClass:"nav-item",
-        nodes:[
-                {
-                    id:"11",
-                    label: '管理系統',
-                    to:"",
-                    nodes: []
-
-                },
-                {
-                    id:"12",
-                    label: '資產系統',
-                    to:"",
-                    nodes: []
-
-                }
-
-            ]
-    }
-    //子菜單數據
-    let childrenes=[
+let tree = 
+{
+    index:"1",
+    label:'主頁面',
+    isRoot:true,
+    depth:0,
+    to:"",
+    myClass:"nav-item",
+    nodes:
+[
+{
+    index:"11",
+    label: '管理系統',
+    isRoot:false,
+    depth:1,
+    to:"",
+    myClass:"nav-item",
+    nodes: [
         {
-            parentId:11,
-            nodes:[
-                {
-                    label: '部門',
-                    to:"/act-sys/dept",             
-                }, 
-                {
-                    label: '角色' ,
-                    to:"/act-sys/role",
+            index:"111",
+            label: '部門',
+            isRoot:false,
+            depth:2,
+            to:"/act-sys/dept",
+            myClass:"nav-item",
 
-                }, 
-                {
-                    label: '廳團對數' ,
-                    to:"/fbrel",
-                }       
-            ]
-        },
+            
+        }, 
         {
-            parentId:12,
-            nodes:[
-                {
-                    label: '資產管理',
-                    to:"/asset-sys/item",
-                }, 
-                {
-                    label: '資產類型' ,
-                    to:"/asset-sys/itemType",
-                }, 
-                {
-                    label: '資產單位' ,
-                    to:"/asset-sys/itemUnit",
-                }, 
-                {
+            index:"112",
+            label: '角色' ,
+            isRoot:false,
+            to:"/act-sys/role",
+            depth:2,
+            myClass:"nav-item",
 
-                    label: '倉庫管理' ,
-                    to:"/asset-sys/StoreHouse",
-                }, 
-                {
-                    label:'供應商管理' ,
-                    to:"/asset-sys/Vendor",
-                },         
-                {
-                    label: '入倉管理' ,
-                    to:"/asset-sys/Transaction",
-                }, 
-                {
+        }, 
+        {
+            index:"113",
+            label: '廳團對數' ,
+            isRoot:false,
+            to:"/fbrel",
+            depth:2,
+            myClass:"nav-item",
 
-                    label: '轉倉管理' ,
-                    to:"/asset-sys/Transfer",
-                }, 
-                {
-                    label: '報銷管理' ,
-                    to:"/asset-sys/Discard",
-                }      
-            ]
-        }    
-
-
+        }
     ]
+  
+
+
+},
+{
+    index:"12",
+    label: '資產系統',
+    isRoot:true,
+    depth:1,
+    to:"",
+    myClass:"nav-item",
+    nodes: [
+        {
+            index:"121",
+            label: '資產管理',
+            depth:2,
+            isRoot:false,
+            to:"/asset-sys/item",
+            myClass:"nav-item",
+        }, 
+        {
+            index:"122",
+            label: '資產類型' ,
+            isRoot:false,
+            depth:2,
+            to:"/asset-sys/itemType",
+            myClass:"nav-item",
+        }, 
+        {
+            index:"123",
+            label: '資產單位' ,
+            isRoot:false,
+            depth:2,
+            to:"/asset-sys/itemUnit",
+            myClass:"nav-item",
+        }, 
+        {
+            index:"124",
+            label: '倉庫管理' ,
+            isRoot:false,
+            depth:2,
+            to:"/asset-sys/StoreHouse",
+            myClass:"nav-item",
+        }, 
+        {
+            index:"125",
+            label:'供應商管理' ,
+            isRoot:false,
+            depth:2,
+            to:"/asset-sys/Vendor",
+            myClass:"nav-item",
+        },         
+        {
+            index:"126",
+            label: '入倉管理' ,
+            isRoot:false,
+            depth:2,
+            to:"/asset-sys/Transaction",
+            myClass:"nav-item",
+        }, 
+        {
+            index:"127",
+            label: '轉倉管理' ,
+            isRoot:false,
+            depth:2,
+            to:"/asset-sys/Transfer",
+            myClass:"nav-item",
+        }, 
+        {
+            index:"128",
+            label: '報銷管理' ,
+            isRoot:false,
+            depth:2,
+            to:"/asset-sys/Discard",
+            myClass:"nav-item",
+        }
+    ]
+
+}
+
+]
+}
     export default {
         name: "Main",
         data() {
@@ -186,6 +251,16 @@
             }
         },
         methods: {
+            changeTxtCol(tabID) {
+                for(let i=0; i < this.navItemList.length; i++) {
+                    let item = this.navItemList[i]
+                    if(item.tabID == tabID) {
+                        item.classValue = this.navItemClass.sel
+                    } else {
+                        item.classValue = this.navItemClass.notSel
+                    }
+                }
+            },
             toLogout() {
                 let self = this
 
@@ -217,7 +292,11 @@
                 }
             },
 
-
+            //展开收起按钮点击 By Xing
+            changeExpand(menu) {
+                menu.isExpand = !menu.isExpand
+                //console.log(menu.isExpand)
+            },
             
         },
         mounted: function() {
@@ -231,42 +310,70 @@
                 return
             }
 
-            //>>>>>>>初始化樹型菜單 by xing 2020-03-03
-            this.tree.nodes.forEach(item => {
-                for (let index = 0; index < childrenes.length; index++) {
-                    if( childrenes[index].parentId==item.id){                       
-                        for (let i = 0; i < childrenes[index].nodes.length; i++) {
-                            let nodeInfo2={
-                                        id:item.id+String(i),
-                                        depth:2,
-                                        isRoot:false,
-                                        label: childrenes[index].nodes[i].label,
-                                        to:childrenes[index].nodes[i].to,
-                                        myClass:"nav-item",
-                            }
-                            childrenes[index].nodes[i]=nodeInfo2
-                            
-                        }
-                        item.nodes=childrenes[index].nodes
-                        break
-                    }
-                    
+            var tabNameList = [
+                "主頁面",
+                // "帳號管理",
+                "部門",
+                "角色",
+                "廳團對數",
+                "資產管理",
+                "資產類型",
+                "資產單位",
+                "倉庫管理",
+                "入倉管理",
+                "轉倉管理",
+                "供應商管理" ,
+                "報銷管理",
+                "資產卡",
+                "測試"
+
+            ]
+            var tabUrls = [
+                "/profile",
+                // "/act-sys/user",
+                "/act-sys/dept",
+                "/act-sys/role",
+                "/fbrel",
+                "/asset-sys/item",
+                "/asset-sys/itemType",
+                "/asset-sys/itemUnit",
+                "/asset-sys/StoreHouse",
+                "/asset-sys/Transaction",
+                "/asset-sys/Transfer",
+                "/asset-sys/Vendor",
+                "/asset-sys/Discard",
+                "/asset-sys/Asset",
+                "/test" 
+
+            ]
+
+              for(let i = 1; i <= tabNameList.length; i++) {
+                let item = {
+                    "tabID": "nav-item" + i,
+                    "tabName": tabNameList[i-1],
+                    "classValue": self.navItemClass.notSel,
+                    "url": tabUrls[i-1]
+
                 }
+                self.navItemList.push(item)
+            }            
 
-                 let nodeInfo={
-                                id:item.id,
-                                depth:1,
-                                isRoot:true,
-                                label: item.label,
-                                to:item.to,
-                                myClass:"nav-item",
-                                nodes:item.nodes
-                 }
-                 item= nodeInfo        
+            //  for(let i = 1; i <= tabNameList.length; i++) {
+            //     let item = {
+            //         "tabID": "nav-item" + i,
+            //         "tabName": tabNameList[i-1],
+            //         "classValue": self.navItemClass.notSel,
+            //         "url": tabUrls[i-1]
 
-            })
-           //<<<<<<<<<初始化樹型菜單 by xing 2020-03-03
+            //     }
+            //     self.navItemList.push(item)
+            // } 
+            
+          
 
+
+            // 指向「主面頁」
+            self.navItemList[0].classValue = self.navItemClass.sel
         },
         components: {
             LogoutAccount,

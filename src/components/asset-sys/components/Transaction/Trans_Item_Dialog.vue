@@ -25,7 +25,7 @@
 
 
           </template>
-          <template v-slot:selectButton="myItem">
+          <template v-slot:selectButton="">
             <b-button @click="selectAll">頁全選</b-button>
             <b-button @click="unSelectAll" class="ml-3">取消全部選擇</b-button>
           </template>
