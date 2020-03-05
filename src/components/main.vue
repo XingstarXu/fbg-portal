@@ -79,6 +79,7 @@
         id:"1",
         label:'主頁面',
         isRoot:true,
+        isFolder:true,
         depth:0,
         to:"",
         myClass:"nav-item",
@@ -87,14 +88,20 @@
                     id:"11",
                     label: '管理系統',
                     to:"",
-                    nodes: []
+                    nodes: [],
+                    isFolder:true,
+                    isRoot:false,
+                    depth:1
 
                 },
                 {
                     id:"12",
                     label: '資產系統',
                     to:"",
-                    nodes: []
+                    nodes: [],
+                    isFolder:true,
+                    isRoot:false,
+                    depth:1
 
                 }
 
@@ -220,17 +227,7 @@
 
             
         },
-        mounted: function() {
-            let self = this
-            if(self.$cookies.isKey("security_id")) {
-                self.securityID = self.$cookies.get("security_id")
-            }
-            else {
-                // 轉至「登入」頁面
-                self.$router.replace(self.component.login)
-                return
-            }
-
+        created: function(){
             //>>>>>>>初始化樹型菜單 by xing 2020-03-03
             this.tree.nodes.forEach(item => {
                 for (let index = 0; index < childrenes.length; index++) {
@@ -242,7 +239,9 @@
                                         isRoot:false,
                                         label: childrenes[index].nodes[i].label,
                                         to:childrenes[index].nodes[i].to,
+                                        isFolder:false,
                                         myClass:"nav-item",
+
                             }
                             childrenes[index].nodes[i]=nodeInfo2
                             
@@ -251,21 +250,24 @@
                         break
                     }
                     
-                }
-
-                 let nodeInfo={
-                                id:item.id,
-                                depth:1,
-                                isRoot:true,
-                                label: item.label,
-                                to:item.to,
-                                myClass:"nav-item",
-                                nodes:item.nodes
-                 }
-                 item= nodeInfo        
+                }      
 
             })
            //<<<<<<<<<初始化樹型菜單 by xing 2020-03-03
+
+        }, 
+        mounted: function() {
+            let self = this
+            if(self.$cookies.isKey("security_id")) {
+                self.securityID = self.$cookies.get("security_id")
+            }
+            else {
+                // 轉至「登入」頁面
+                self.$router.replace(self.component.login)
+                return
+            }
+
+
 
         },
         components: {

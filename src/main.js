@@ -50,7 +50,10 @@ import {
     faCaretSquareRight,
     faCaretSquareLeft,
     faEdit,
-    faCheck
+    faCheck,
+    faFolder,
+    faFolderOpen,
+    faHome
 } from "@fortawesome/free-solid-svg-icons"
 library.add(
     faUserCircle,
@@ -67,7 +70,10 @@ library.add(
     faCaretSquareRight,
     faCaretSquareLeft,
     faEdit,
-    faCheck
+    faCheck,
+    faFolder,
+    faFolderOpen,
+    faHome
 );
 Vue.component("font-awesome-icon", FontAwesomeIcon)
 

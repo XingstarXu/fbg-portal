@@ -7,10 +7,13 @@
          @click="toggleChildren"
          :class="myClass"
          :to="to"        
-         > {{ label }}
+         > 
+         <font-awesome-icon v-if="isFolder" :icon="showChildren?'folder-open':'folder'"/>
+         <font-awesome-icon v-if="isRoot" icon="home"/>
+         {{ label }}
         </b-nav-item>
 
-        <template v-if="showChildren || isRoot"> 
+        <template v-if="showChildren"> 
             <tree-menu 
             v-for="(node,index) in nodes"
             :nodes="node.nodes"
@@ -19,8 +22,9 @@
             :key="index"
             :to="node.to"
             :myClass="node.myClass"
+            :isFolder="node.isFolder"
             >
-            {{showChildren || isRoot}}
+            {{showChildren}}
             </tree-menu>
         </template>
     </div>
@@ -30,7 +34,7 @@
 
 export default {
     name :"tree-menu",
-    props:['label','nodes','depth','isRoot','to','myClass'],
+    props:['label','nodes','depth','isRoot','to','myClass','isFolder'],
     data(){
         return {
             showChildren:false,
@@ -52,6 +56,7 @@ export default {
             this.showChildren=!this.showChildren
             let myRoot=this.$parent//整個樹型菜單
             let w=true
+            
             //循環查找獲取整個樹型菜單
             while (w) {
                 //如果找到置頂菜單或所選的菜單項是置頂菜單時即退出循環，查找結束。
