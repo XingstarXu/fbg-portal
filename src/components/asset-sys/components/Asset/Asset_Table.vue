@@ -18,6 +18,12 @@
                     </b-row>
                 </b-container>
             </template>
+            <template v-slot:buttenAdd>
+              <b-button variant="success" align="right" @click="goToPrint">
+                   <font-awesome-icon icon="plus-square" />
+                   打印列表
+               </b-button>
+            </template>
             <template v-slot:diyColumn="myItem">
                 <b-button @click="showCard(myItem.data.item)" variant="info"><font-awesome-icon icon="info-circle" /></b-button>
             </template>            
@@ -68,7 +74,6 @@ export default {
     },
     methods:{
         showCard(item){
-            console.log(item)
             this.$parent.$refs.asCard.setData(item)
             this.$bvModal.show("ModalDialog")
         },
@@ -101,6 +106,10 @@ export default {
             if(item.void==1){
                 return "table-danger"
             }
+        },
+        goToPrint(){
+            this.$parent.$refs.asCard.setDataList(this.$refs.child.rows)
+            this.$bvModal.show("ModalDialog")
         }
 
     },

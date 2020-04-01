@@ -17,7 +17,7 @@
 
 <script>
 import AssetTable from "../../components/Asset/Asset_Table";
-import AssetCard from "../../components/Asset/Asset_Card";
+import AssetCard from "../../components/Asset/Asset_Card_Print_List_test";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
 

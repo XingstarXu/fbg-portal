@@ -87,6 +87,12 @@ import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 
 Vue.use(VueSidebarMenu)
 
+// import  Printd  from 'printd'
+// Vue.use(Printd)
+
+import htmlToPdf from './components/asset-sys/Plugins/ExportPDF/HtmlToPDF.js' 
+Vue.use(htmlToPdf) 
+
 new Vue({
     router,
     render: h => h(App),

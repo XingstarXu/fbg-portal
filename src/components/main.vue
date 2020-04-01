@@ -97,8 +97,56 @@
                 {
                     id:"12",
                     label: '資產系統',
-                    to:"",
+                    to:"/asset-sys/Asset",
                     nodes: [],
+                    isFolder:true,
+                    isRoot:false,
+                    depth:1
+
+                },
+                {
+                    id:"13",
+                    label: '5層菜單',
+                    to:"",
+                    nodes: [
+                        {
+                            id:"131",
+                            label: '第3層01',
+                            to:"",
+                            nodes: [
+                                {
+                                    id:"1311",
+                                    label: '第4層01_1',
+                                    to:"",
+                                    nodes: [],
+                                    isFolder:true,
+                                    isRoot:false,
+                                    depth:3      
+                                },
+                                {
+                                    id:"1312",
+                                    label: '第4層01_2',
+                                    to:"",
+                                    nodes: [],
+                                    isFolder:true,
+                                    isRoot:false,
+                                    depth:3                                     
+                                }                         
+                            ],
+                            isFolder:true,
+                            isRoot:false,
+                            depth:2                           
+                        },
+                        {
+                            id:"132",
+                            label: '第3層02',
+                            to:"",
+                            nodes: [],
+                            isFolder:true,
+                            isRoot:false,
+                            depth:2                           
+                        },                        
+                    ],
                     isFolder:true,
                     isRoot:false,
                     depth:1
@@ -163,9 +211,43 @@
                 {
                     label: '報銷管理' ,
                     to:"/asset-sys/Discard",
-                }      
+                }, 
+                // {
+                //     label: '測試' ,
+                //     to:"/asset-sys/Asset",
+                // }      
             ]
-        }    
+        },
+        {
+            parentId:1311,
+            nodes:[
+                {
+                    label: '第5層菜單01',
+                    to:"/asset-sys/itemType",
+                }, 
+  
+            ]
+        },
+        {
+            parentId:1312,
+            nodes:[
+                {
+                    label: '第5層菜單02',
+                    to:"/asset-sys/itemUnit",
+                }, 
+  
+            ]
+        },
+        {
+            parentId:132,
+            nodes:[
+                {
+                    label: '第4層菜單02',
+                    to:"/asset-sys/StoreHouse",
+                }, 
+  
+            ]
+        }     
 
 
     ]
@@ -224,33 +306,50 @@
                 }
             },
 
+            //初始化樹型菜單 by xing 2020-03-10
+            setNodeItem(node){
+                let reNode=node
+                if(reNode.nodes==undefined || reNode.nodes.length<=0){
+                    for (let index = 0; index < childrenes.length; index++) {
+                        //let myItem=this.getNodeItem(item)
+                        if( childrenes[index].parentId==reNode.id){                       
+                            for (let i = 0; i < childrenes[index].nodes.length; i++) {
+                                let nodeInfo2={
+                                            id:reNode.id+String(i),
+                                            depth:reNode.depth+1,
+                                            isRoot:false,
+                                            label: childrenes[index].nodes[i].label,
+                                            to:childrenes[index].nodes[i].to,
+                                            isFolder:false,
+                                            myClass:"nav-item",
+
+                                }
+                                childrenes[index].nodes[i]=nodeInfo2
+                                
+                            }
+                            reNode.nodes=childrenes[index].nodes
+                            break
+                        }
+                        
+                    }
+                    return
+                }
+                else{
+                    reNode.nodes.forEach(item=>{
+                         this.setNodeItem(item)
+                    })
+                   
+                }
+
+            }
+
 
             
         },
         created: function(){
             //>>>>>>>初始化樹型菜單 by xing 2020-03-03
             this.tree.nodes.forEach(item => {
-                for (let index = 0; index < childrenes.length; index++) {
-                    if( childrenes[index].parentId==item.id){                       
-                        for (let i = 0; i < childrenes[index].nodes.length; i++) {
-                            let nodeInfo2={
-                                        id:item.id+String(i),
-                                        depth:2,
-                                        isRoot:false,
-                                        label: childrenes[index].nodes[i].label,
-                                        to:childrenes[index].nodes[i].to,
-                                        isFolder:false,
-                                        myClass:"nav-item",
-
-                            }
-                            childrenes[index].nodes[i]=nodeInfo2
-                            
-                        }
-                        item.nodes=childrenes[index].nodes
-                        break
-                    }
-                    
-                }      
+                this.setNodeItem(item)     
 
             })
            //<<<<<<<<<初始化樹型菜單 by xing 2020-03-03
